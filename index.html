@@ -12,6 +12,7 @@
       --card: #ffffff;
       --border-radius: 12px;
     }
+
     body {
       font-family: "Segoe UI", "Noto Sans SC", sans-serif;
       background-color: var(--background);
@@ -19,16 +20,22 @@
       padding: 20px;
       color: #333;
     }
-    h1, h2, h3 {
+
+    h1,
+    h2,
+    h3 {
       color: var(--primary);
     }
+
     h1 {
       font-size: 28px;
       margin-bottom: 20px;
     }
+
     .section {
       margin-top: 30px;
     }
+
     .btn {
       display: inline-block;
       background-color: var(--primary);
@@ -40,18 +47,23 @@
       cursor: pointer;
       transition: background 0.3s ease;
     }
+
     .btn:hover {
       background-color: #a06d48;
     }
+
     .hidden {
       display: none;
     }
+
     label {
       display: block;
       margin: 10px 0 5px;
       font-weight: bold;
     }
-    input[type="number"], textarea {
+
+    input[type="number"],
+    textarea {
       width: 100%;
       padding: 10px;
       margin-bottom: 10px;
@@ -59,14 +71,16 @@
       border-radius: 6px;
       box-sizing: border-box;
     }
+
     .person-block {
       background: var(--card);
       border: 1px solid #ddd;
       border-radius: var(--border-radius);
       padding: 15px;
       margin-bottom: 20px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     }
+
     .output {
       background: #f2f2f2;
       padding: 15px;
@@ -75,11 +89,13 @@
       margin-top: 20px;
       font-size: 15px;
     }
+
     .subheader {
       font-size: 18px;
       color: #7a4212;
       margin: 20px 0 10px;
     }
+
     .order-entry {
       background: #fff;
       border: 1px solid #ccc;
@@ -88,12 +104,26 @@
       margin-bottom: 15px;
       position: relative;
     }
+
     .edit-btn {
       position: absolute;
       top: 10px;
       right: 10px;
       background: #ccc;
       color: #000;
+      border: none;
+      border-radius: 6px;
+      padding: 4px 8px;
+      cursor: pointer;
+      font-size: 12px;
+      margin-left: 5px;
+    }
+    .delete-btn {
+      position: absolute;
+      top: 10px;
+      right: 50px;
+      background: #e74c3c;
+      color: #fff;
       border: none;
       border-radius: 6px;
       padding: 4px 8px;
@@ -152,16 +182,16 @@
       "猪心"
     ];
     const emojiMap = {
-      "猪肝": "🫀",
-      "猪腰": "🫘",
-      "猪肠": "➰",
-      "猪肚": "🫃",
-      "猪舌头": "👅",
-      "瘦肉": "🍖",
-      "肥肉": "🥓",
-      "菜": "🥬",
-      "肉丸": "🍡",
-      "猪心": "❤️‍🔥"
+      猪肝: "🫀",
+      猪腰: "🫘",
+      猪肠: "➰",
+      猪肚: "🫃",
+      猪舌头: "👅",
+      瘦肉: "🍖",
+      肥肉: "🥓",
+      菜: "🥬",
+      肉丸: "🍡",
+      猪心: "❤️‍🔥"
     };
     let editingIndex = null;
     let editingData = null;
@@ -214,11 +244,11 @@
         div.className = "person-block";
         div.innerHTML = `<h3>🥣 第 ${i + 1} 碗汤</h3>`;
         div.innerHTML += `<label>这碗汤几人共用？</label>
-          <input type="number" name="b${i}_count" min="1" max="${numPeople}" value="1" />
+          <input type="number" name="b${i}_count" min="1" max="${numPeople}" value="1">
           <label>这碗汤不吃的材料：</label>`;
         ingredients.forEach((item) => {
           const emoji = emojiMap[item] || "";
-          div.innerHTML += `<label><input type="checkbox" name="b${i}_no" value="${item}" /> ${emoji} ${item}</label>`;
+          div.innerHTML += `<label><input type="checkbox" name="b${i}_no" value="${item}"> ${emoji} ${item}</label>`;
         });
         area.appendChild(div);
       }
@@ -233,7 +263,7 @@
         orderNumber = (parseInt(localStorage.getItem("lastOrder") || "0") % 50) + 1;
         localStorage.setItem("lastOrder", orderNumber);
       } else {
-        orderNumber = orders[editingIndex].number;
+        orderNumber = editingIndex + 1;
       }
 
       const numPeople = parseInt(document.getElementById("numPeople").value);
@@ -241,138 +271,124 @@
       const whiteRice = parseInt(document.getElementById("whiteRice").value);
       const taroRice = parseInt(document.getElementById("taroRice").value);
 
+      if (!numPeople || numPeople < 1) {
+        alert("请输入正确的用餐人数！");
+        return;
+      }
+      if (!numBowls || numBowls < 1) {
+        alert("请输入正确的共用汤数！");
+        return;
+      }
+
       const bowls = [];
       for (let i = 0; i < numBowls; i++) {
-        const count = parseInt(document.querySelector(`input[name="b${i}_count"]`).value);
-        const noItemsEls = document.querySelectorAll(`input[name="b${i}_no"]:checked`);
-        const noItems = Array.from(noItemsEls).map(el => el.value);
+        const count = parseInt(document.querySelector(`input[name="b${i}_count"]`).value) || 1;
+        const noItems = Array.from(document.querySelectorAll(`input[name="b${i}_no"]:checked`)).map((c) => c.value);
         bowls.push({ count, noItems });
       }
 
-      // 生成输出文本
-      let output = `🎉 大山脚芋头饭订单 #${orderNumber} (${today})\n`;
-      output += `用餐人数：${numPeople}人\n`;
-      output += `白饭：${whiteRice}碗，芋头饭：${taroRice}碗\n\n`;
-      output += `汤：${numBowls}碗\n`;
+      // 生成订单文本
+      let text = `第${orderNumber}号点单 (${today})\n`;
+      text += `用餐人数：${numPeople}人\n共用汤数：${numBowls}碗\n`;
 
       bowls.forEach((bowl, i) => {
-        output += `\n🥣 第${i + 1}碗汤（共用${bowl.count}人）\n`;
-        ingredients.forEach(item => {
-          if (!bowl.noItems.includes(item)) {
-            output += `${emojiMap[item] || ""} ${item} `;
-          }
-        });
-        output += "\n";
+        let line = `第${i + 1}碗汤：${bowl.count}人共用，`;
+        if (bowl.noItems.length) {
+          line += `不吃：${bowl.noItems.join("、")}`;
+        } else {
+          line += `全吃`;
+        }
+        text += line + "\n";
       });
 
-      if (editingIndex === null) {
-        orders.push({
-          number: orderNumber,
-          numPeople,
-          numBowls,
-          whiteRice,
-          taroRice,
-          bowls,
-          created: new Date().toISOString()
-        });
-      } else {
-        orders[editingIndex] = {
-          number: orderNumber,
-          numPeople,
-          numBowls,
-          whiteRice,
-          taroRice,
-          bowls,
-          created: new Date().toISOString()
-        };
+      text += `白饭：${whiteRice}碗\n芋头饭：${taroRice}碗\n`;
+
+      // 订单对象
+      const orderObj = {
+        number: orderNumber,
+        date: today,
+        numPeople,
+        numBowls,
+        whiteRice,
+        taroRice,
+        bowls,
+        text
+      };
+
+      if (editingIndex !== null) {
+        orders[editingIndex] = orderObj;
         editingIndex = null;
+      } else {
+        orders.push(orderObj);
       }
-
       localStorage.setItem("orders", JSON.stringify(orders));
-
-      const outputArea = document.getElementById("finalOutput");
-      outputArea.innerHTML = `<pre class="output">${output}</pre>`;
-
-      // 切回订单总表显示更新
-      setTimeout(() => {
-        showSection("summary");
-      }, 2000);
+      alert("订单已保存！");
+      showSection("summary");
     }
 
     function renderSummary() {
       const orders = JSON.parse(localStorage.getItem("orders") || "[]");
-      const summaryArea = document.getElementById("summaryArea");
-      if (orders.length === 0) {
-        summaryArea.textContent = "目前没有订单。";
+      const area = document.getElementById("summaryArea");
+      area.innerHTML = "";
+      if (!orders.length) {
+        area.innerHTML = '<div class="output">暂无订单</div>';
         return;
       }
-
-      summaryArea.innerHTML = "";
-      orders.forEach((order, i) => {
+      orders.forEach((o, idx) => {
         const div = document.createElement("div");
         div.className = "order-entry";
-
-        let text = `订单 #${order.number} (${new Date(order.created).toLocaleString()})\n`;
-        text += `用餐人数：${order.numPeople}人\n`;
-        text += `白饭：${order.whiteRice}碗，芋头饭：${order.taroRice}碗\n`;
-        text += `汤：${order.numBowls}碗\n`;
-
-        order.bowls.forEach((bowl, idx) => {
-          text += `  第${idx + 1}碗汤（共用${bowl.count}人），不吃：${bowl.noItems.join(", ") || "无"}\n`;
-        });
-
-        div.innerHTML = `<pre>${text}</pre>`;
-        const btn = document.createElement("button");
-        btn.textContent = "✏️ 编辑";
-        btn.className = "edit-btn";
-        btn.onclick = () => editOrder(i);
-        div.appendChild(btn);
-
-        summaryArea.appendChild(div);
+        div.innerHTML = `
+          <button class='edit-btn' onclick='editOrder(${idx})'>✏️ 编辑</button>
+          <button class='delete-btn' onclick='deleteOrder(${idx})'>🗑️ 删除</button>
+          <pre>${o.text}</pre>
+        `;
+        area.appendChild(div);
       });
     }
 
     function editOrder(index) {
       const orders = JSON.parse(localStorage.getItem("orders") || "[]");
-      if (!orders[index]) return alert("找不到订单");
       editingIndex = index;
       editingData = orders[index];
       showSection("order");
     }
 
-    function exportOrders() {
-      const orders = JSON.parse(localStorage.getItem("orders") || "[]");
-      if (orders.length === 0) {
-        alert("没有订单可以导出。");
-        return;
-      }
-      let txt = "";
-      orders.forEach(order => {
-        txt += `订单 #${order.number} - ${new Date(order.created).toLocaleString()}\n`;
-        txt += `用餐人数：${order.numPeople}人\n`;
-        txt += `白饭：${order.whiteRice}碗，芋头饭：${order.taroRice}碗\n`;
-        txt += `汤：${order.numBowls}碗\n`;
-        order.bowls.forEach((bowl, i) => {
-          txt += `  第${i + 1}碗汤（共用${bowl.count}人），不吃：${bowl.noItems.join(", ") || "无"}\n`;
-        });
-        txt += "\n";
-      });
-
-      const blob = new Blob([txt], { type: "text/plain;charset=utf-8" });
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = "yutou_orders.txt";
-      a.click();
-      URL.revokeObjectURL(a.href);
+    function deleteOrder(index) {
+      if (!confirm("确定删除此订单吗？")) return;
+      let orders = JSON.parse(localStorage.getItem("orders") || "[]");
+      orders.splice(index, 1);
+      localStorage.setItem("orders", JSON.stringify(orders));
+      renderSummary();
     }
 
-    document.getElementById("numPeople").addEventListener("change", generateBowlSections);
-    document.getElementById("numBowls").addEventListener("change", generateBowlSections);
+    function exportOrders() {
+      const orders = JSON.parse(localStorage.getItem("orders") || "[]");
+      if (!orders.length) {
+        alert("没有订单可导出！");
+        return;
+      }
+      let text = "";
+      orders.forEach((o) => {
+        text += o.text + "\n\n";
+      });
+      const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = `orders_${new Date().toISOString().slice(0, 10)}.txt`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
 
-    // 初始化时显示首页
+    // 初始化时生成第一碗汤输入框
+    document.getElementById("numBowls").addEventListener("change", generateBowlSections);
+    document.getElementById("numPeople").addEventListener("change", generateBowlSections);
+
+    // 初始化显示首页
     showSection("home");
   </script>
 </body>
 </html>
+
 
 
