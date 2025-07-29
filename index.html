@@ -29,7 +29,7 @@
   <div id="order" class="hidden section">
     <h2>📝 创建新订单</h2>
     <label>👥 用餐人数：</label>
-    <input type="number" id="numPeople" min="1" max="20" value="1">
+    <input type="number" id="numPeople" min="1" max="20" value="1" onchange="generateBowlSections()">
 
     <label>🥣 这些人共用几碗汤？</label>
     <input type="number" id="numBowls" min="1" max="10" value="1" onchange="generateBowlSections()">
@@ -79,7 +79,7 @@
         div.className = "person-block";
         div.innerHTML = `<h3>🥣 第 ${i + 1} 碗汤</h3>`;
 
-        div.innerHTML += `<strong>这碗汤有几位？</strong><br>
+        div.innerHTML += `<strong>这碗汤几人共用？</strong><br>
           <input type="number" name="b${i}_count" min="1" max="${numPeople}" value="1"><br><br>
           <strong>这碗汤不吃的材料：</strong><br>`;
         ingredients.forEach(item => {
@@ -100,11 +100,7 @@
       const whiteRice = document.getElementById("whiteRice").value;
       const taroRice = document.getElementById("taroRice").value;
 
-      let result = `🧾 大山脚芋头饭专卖店
-📅 日期：${today}
-🧾 订单编号：${orderNumber}
-👥 用餐人数：${numPeople}
-🥣 共用汤：${numBowls} 碗\n`;
+      let result = `🧾 大山脚芋头饭专卖店\n📅 日期：${today}\n🧾 订单编号：${orderNumber}\n👥 用餐人数：${numPeople}\n🥣 共用汤：${numBowls} 碗\n`;
 
       for (let i = 0; i < numBowls; i++) {
         const count = document.querySelector(`input[name="b${i}_count"]`).value;
@@ -124,6 +120,12 @@
       let all = orders.map(o => o.text).join("\n\n---------------------------\n\n");
       document.getElementById("summaryArea").innerHTML = `<div class="output">${all || "暂无订单"}</div>`;
     }
+
+    // 初始加载自动显示订单部分汤碗设置
+    window.addEventListener('DOMContentLoaded', () => {
+      generateBowlSections();
+    });
   </script>
 </body>
 </html>
+
