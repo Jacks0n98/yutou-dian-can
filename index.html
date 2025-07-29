@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>大山脚芋头饭专卖店 - 简洁点餐系统</title>
+  <title>大山脚芋头饭专卖店 - 点餐系统</title>
   <style>
     body { font-family: sans-serif; background: #f8f8f8; padding: 20px; }
     h2 { color: #5a2d0c; }
@@ -23,7 +23,7 @@
     <input type="number" id="numPeople" min="1" max="50" value="1">
 
     <label for="numSoups">🥣 汤共用几碗：</label>
-    <input type="number" id="numSoups" min="1" max="10" value="1">
+    <input type="number" id="numSoups" min="1" max="10" value="1" oninput="generateSoupInputs()">
 
     <div id="soupArea"></div>
 
@@ -45,12 +45,12 @@
     const ingredients = ["猪肝", "猪腰", "猪肠", "猪肚", "猪舌头", "瘦肉", "肥肉", "菜", "肉丸"];
     let orderNumber = parseInt(localStorage.getItem("orderNumber") || "0");
 
-    document.getElementById("numSoups").addEventListener("input", generateSoupInputs);
-
     function generateSoupInputs() {
       const soupArea = document.getElementById("soupArea");
       const count = parseInt(document.getElementById("numSoups").value);
       soupArea.innerHTML = '';
+
+      if (isNaN(count) || count <= 0) return;
 
       for (let i = 0; i < count; i++) {
         const div = document.createElement("div");
@@ -64,8 +64,6 @@
       }
     }
 
-    generateSoupInputs();
-
     function generateSummary() {
       const numPeople = parseInt(document.getElementById("numPeople").value);
       const numSoups = parseInt(document.getElementById("numSoups").value);
@@ -74,7 +72,6 @@
       const remark = document.getElementById("remark").value.trim();
       const today = new Date().toISOString().split('T')[0];
 
-      // 订单编号轮询 1~50
       orderNumber = (orderNumber % 50) + 1;
       localStorage.setItem("orderNumber", orderNumber);
 
@@ -94,6 +91,9 @@
 
       document.getElementById("summaryArea").textContent = output;
     }
+
+    // 默认执行一次
+    window.onload = generateSoupInputs;
   </script>
 
 </body>
