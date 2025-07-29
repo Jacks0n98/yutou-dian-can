@@ -154,6 +154,7 @@
 
   <script>
     const ingredients = ["猪肝", "猪腰", "猪肠", "猪肚", "猪舌头", "瘦肉", "肥肉", "菜", "肉丸"];
+    let editingIndex = null;
 
     function showSection(sectionId) {
       document.getElementById('home').classList.add('hidden');
@@ -196,8 +197,14 @@
     function generateFinalOrder() {
       const orders = JSON.parse(localStorage.getItem("orders") || "[]");
       const today = new Date().toISOString().split("T")[0];
-      let orderNumber = (parseInt(localStorage.getItem("lastOrder") || "0") % 50) + 1;
-      localStorage.setItem("lastOrder", orderNumber);
+
+      let orderNumber;
+      if (editingIndex === null) {
+        orderNumber = (parseInt(localStorage.getItem("lastOrder") || "0") % 50) + 1;
+        localStorage.setItem("lastOrder", orderNumber);
+      } else {
+        orderNumber = orders[editingIndex].number;
+      }
 
       const numPeople = document.getElementById("numPeople").value;
       const numBowls = document.getElementById("numBowls").value;
@@ -215,8 +222,16 @@
       result += `\n🍚 白饭：${whiteRice} 碗\n🍚 芋头饭：${taroRice} 碗`;
       document.getElementById("finalOutput").innerHTML = `<div class="output">${result}</div>`;
 
-      orders.unshift({ date: today, number: orderNumber, text: result });
-      localStorage.setItem("orders", JSON.stringify(orders.slice(0, 50)));
+      const newOrder = { date: today, number: orderNumber, text: result };
+      if (editingIndex !== null) {
+        orders[editingIndex] = newOrder;
+        editingIndex = null;
+      } else {
+        orders.unshift(newOrder);
+        orders.splice(50);
+      }
+
+      localStorage.setItem("orders", JSON.stringify(orders));
       showSection('summary');
     }
 
@@ -249,14 +264,8 @@
     }
 
     function editOrder(index) {
-      const orders = JSON.parse(localStorage.getItem("orders") || "[]");
-      const current = orders[index];
-      const newText = prompt("编辑订单内容：", current.text);
-      if (newText !== null) {
-        orders[index].text = newText;
-        localStorage.setItem("orders", JSON.stringify(orders));
-        renderSummary();
-      }
+      editingIndex = index;
+      showSection("order");
     }
 
     window.addEventListener('DOMContentLoaded', () => {
@@ -267,4 +276,3 @@
   </script>
 </body>
 </html>
-
