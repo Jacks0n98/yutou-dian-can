@@ -3,96 +3,143 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>订单总表 - 大山脚芋头饭专卖店</title>
+  <title>创建订单 - 大山脚芋头饭专卖店</title>
   <style>
     body {
-      font-family: "Noto Sans SC", "Segoe UI", sans-serif;
-      background-color: #f9f9f9;
+      font-family: "Noto Sans SC", sans-serif;
+      background-color: #fffaf4;
+      margin: 0;
       padding: 20px;
     }
-
     h1 {
-      color: #4a2c1a;
-      font-size: 24px;
+      color: #5d3a00;
+      font-size: 26px;
       margin-bottom: 20px;
     }
-
-    table {
-      border-collapse: collapse;
+    label {
+      display: block;
+      margin: 10px 0 5px;
+    }
+    input, select, button, textarea {
+      padding: 8px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
       width: 100%;
-      background: white;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-
-    th, td {
-      padding: 12px 16px;
-      border-bottom: 1px solid #ddd;
-      text-align: left;
-    }
-
-    th {
+    button {
       background-color: #a47148;
       color: white;
-    }
-
-    tr:hover {
-      background-color: #f1f1f1;
-    }
-
-    .btn-delete {
-      background-color: #d9534f;
-      color: white;
-      border: none;
-      padding: 5px 10px;
       cursor: pointer;
-      border-radius: 4px;
     }
-
-    .btn-delete:hover {
-      background-color: #c9302c;
+    button:hover {
+      background-color: #8b5a38;
+    }
+    .section {
+      margin-top: 30px;
+      padding: 15px;
+      border: 1px solid #e0d2c0;
+      border-radius: 10px;
+      background-color: #fff;
+    }
+    .group {
+      border: 1px solid #d9c5b2;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 8px;
     }
   </style>
 </head>
 <body>
-  <h1>📋 订单总表</h1>
-  <table id="ordersTable">
-    <thead>
-      <tr>
-        <th>订单编号</th>
-        <th>日期</th>
-        <th>共用信息</th>
-        <th>饭类</th>
-        <th>不吃材料</th>
-        <th>操作</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+  <h1>🍽 创建订单</h1>
+  <form id="orderForm">
+    <label for="date">日期：</label>
+    <input type="date" id="date" name="date" required>
+
+    <label for="peopleCount">👥 用餐人数：</label>
+    <input type="number" id="peopleCount" name="peopleCount" min="1" max="20" required>
+
+    <label for="bowlCount">🍲 汤共几碗：</label>
+    <input type="number" id="bowlCount" name="bowlCount" min="1" required>
+
+    <div id="soupGroups" class="section"></div>
+
+    <label>🍚 饭类选择：</label>
+    <label for="whiteRice">白饭几碗：</label>
+    <input type="number" id="whiteRice" name="whiteRice" min="0" value="0">
+    <label for="taroRice">芋头饭几碗：</label>
+    <input type="number" id="taroRice" name="taroRice" min="0" value="0">
+
+    <button type="submit">✅ 提交订单</button>
+  </form>
 
   <script>
-    const orders = JSON.parse(localStorage.getItem("orders") || "[]");
-    const tbody = document.querySelector("#ordersTable tbody");
+    const ingredients = ["猪肝", "猪腰", "猪肠", "猪肚", "猪舌头", "瘦肉", "肥肉", "菜", "肉丸", "猪心"];
+    const emojis = {"猪肝": "🫀", "猪腰": "🧽", "猪肠": "🌀", "猪肚": "🎯", "猪舌头": "👅", "瘦肉": "🥩", "肥肉": "🍖", "菜": "🥬", "肉丸": "🍡", "猪心": "❤️"};
 
-    orders.forEach((order, index) => {
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td>${order.id}</td>
-        <td>${order.date}</td>
-        <td>${order.sharing}</td>
-        <td>${order.rice}</td>
-        <td>${order.ingredients}</td>
-        <td><button class="btn-delete" onclick="deleteOrder(${index})">删除</button></td>
-      `;
-      tbody.appendChild(row);
-    });
+    const peopleInput = document.getElementById('peopleCount');
+    const bowlInput = document.getElementById('bowlCount');
+    const soupGroupDiv = document.getElementById('soupGroups');
 
-    function deleteOrder(index) {
-      if (confirm("确定要删除这个订单吗？")) {
-        orders.splice(index, 1);
-        localStorage.setItem("orders", JSON.stringify(orders));
-        location.reload();
+    function generateSoupGroups() {
+      soupGroupDiv.innerHTML = '';
+      const totalPeople = parseInt(peopleInput.value);
+      const totalBowls = parseInt(bowlInput.value);
+      if (!totalPeople || !totalBowls || totalBowls > totalPeople) return;
+      const baseCount = Math.floor(totalPeople / totalBowls);
+      const remainder = totalPeople % totalBowls;
+
+      for (let i = 0; i < totalBowls; i++) {
+        const count = baseCount + (i < remainder ? 1 : 0);
+        const group = document.createElement('div');
+        group.className = 'group';
+        group.innerHTML = `<strong>第 ${i + 1} 碗（${count} 人共用）不吃以下材料：</strong><br>`;
+        ingredients.forEach(ing => {
+          const id = `bowl${i}_ing_${ing}`;
+          group.innerHTML += `<label><input type="checkbox" id="${id}" value="${ing}"> ${emojis[ing] || ''} ${ing}</label><br>`;
+        });
+        soupGroupDiv.appendChild(group);
       }
     }
+
+    peopleInput.addEventListener('change', generateSoupGroups);
+    bowlInput.addEventListener('change', generateSoupGroups);
+
+    document.getElementById('orderForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const date = document.getElementById('date').value;
+      const people = peopleInput.value;
+      const bowls = bowlInput.value;
+      const riceWhite = document.getElementById('whiteRice').value;
+      const riceTaro = document.getElementById('taroRice').value;
+
+      let soupPreferences = [];
+      for (let i = 0; i < bowls; i++) {
+        const unchecked = [];
+        ingredients.forEach(ing => {
+          const checkbox = document.getElementById(`bowl${i}_ing_${ing}`);
+          if (checkbox && checkbox.checked) {
+            unchecked.push(ing);
+          }
+        });
+        soupPreferences.push(`第${i+1}碗不吃：${unchecked.join('、') || '无'}`);
+      }
+
+      const order = {
+        date,
+        people,
+        bowls,
+        rice: { white: riceWhite, taro: riceTaro },
+        preferences: soupPreferences
+      };
+
+      const existing = JSON.parse(localStorage.getItem('orders') || '[]');
+      existing.push(order);
+      localStorage.setItem('orders', JSON.stringify(existing));
+      alert('订单已提交！');
+      location.href = 'orders.html';
+    });
   </script>
 </body>
 </html>
