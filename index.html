@@ -12,7 +12,6 @@
       --card: #ffffff;
       --border-radius: 12px;
     }
-
     body {
       font-family: "Segoe UI", "Noto Sans SC", sans-serif;
       background-color: var(--background);
@@ -20,20 +19,11 @@
       padding: 20px;
       color: #333;
     }
-
     h1, h2, h3 {
       color: var(--primary);
     }
-
-    h1 {
-      font-size: 28px;
-      margin-bottom: 20px;
-    }
-
-    .section {
-      margin-top: 30px;
-    }
-
+    h1 { font-size: 28px; margin-bottom: 20px; }
+    .section { margin-top: 30px; }
     .btn {
       display: inline-block;
       background-color: var(--primary);
@@ -45,21 +35,13 @@
       cursor: pointer;
       transition: background 0.3s ease;
     }
-
-    .btn:hover {
-      background-color: #a06d48;
-    }
-
-    .hidden {
-      display: none;
-    }
-
+    .btn:hover { background-color: #a06d48; }
+    .hidden { display: none; }
     label {
       display: block;
       margin: 10px 0 5px;
       font-weight: bold;
     }
-
     input[type="number"], textarea {
       width: 100%;
       padding: 10px;
@@ -68,7 +50,6 @@
       border-radius: 6px;
       box-sizing: border-box;
     }
-
     .person-block {
       background: var(--card);
       border: 1px solid #ddd;
@@ -77,7 +58,6 @@
       margin-bottom: 20px;
       box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
-
     .output {
       background: #f2f2f2;
       padding: 15px;
@@ -86,13 +66,11 @@
       margin-top: 20px;
       font-size: 15px;
     }
-
     .subheader {
       font-size: 18px;
       color: #7a4212;
       margin: 20px 0 10px;
     }
-
     .order-entry {
       background: #fff;
       border: 1px solid #ccc;
@@ -101,7 +79,6 @@
       margin-bottom: 15px;
       position: relative;
     }
-
     .edit-btn {
       position: absolute;
       top: 10px;
@@ -126,21 +103,20 @@
   <div id="order" class="hidden section">
     <h2>📝 创建新订单</h2>
     <label>👥 用餐人数：</label>
-    <input type="number" id="numPeople" min="1" max="20" value="1">
+    <input type="number" id="numPeople" min="1" max="20" value="1" />
 
     <label>🥣 共用几碗汤？</label>
-    <input type="number" id="numBowls" min="1" max="10" value="1">
+    <input type="number" id="numBowls" min="1" max="10" value="1" />
 
     <div id="bowlDetails"></div>
 
     <label>🍚 白饭几碗：</label>
-    <input type="number" id="whiteRice" min="0" value="0">
+    <input type="number" id="whiteRice" min="0" value="0" />
 
     <label>🍚 芋头饭几碗：</label>
-    <input type="number" id="taroRice" min="0" value="0">
+    <input type="number" id="taroRice" min="0" value="0" />
 
     <button class="btn" onclick="generateFinalOrder()">✅ 提交订单</button>
-    <button class="btn" onclick="showSection('summary')">📋 查看订单总表</button>
     <button class="btn" onclick="exportOrders()">📤 导出订单 (txt)</button>
     <div id="finalOutput"></div>
   </div>
@@ -153,19 +129,13 @@
   </div>
 
   <script>
-    const ingredients = ["猪肝", "猪腰", "猪心", "猪肠", "猪肚", "猪舌头", "瘦肉", "肥肉", "菜", "肉丸"];
+    const ingredients = ["猪肝", "猪腰", "猪肠", "猪肚", "猪舌头", "瘦肉", "肥肉", "猪心", "菜", "肉丸"];
     const emojiMap = {
-      "猪肝": "🫀",
-  "猪腰": "🫘",
-  "猪心": "❤️",
-  "猪肠": "➰",
-  "猪肚": "🫃",
-  "猪舌头": "👅",
-  "瘦肉": "🍖",
-  "肥肉": "🥓",
-  "菜": "🥬",
-  "肉丸": "🍡"
+      "猪肝": "🫀", "猪腰": "🫘", "猪肠": "➰", "猪肚": "🫃",
+      "猪舌头": "👅", "瘦肉": "🍖", "肥肉": "🥓", "猪心": "❤️",
+      "菜": "🥬", "肉丸": "🍡"
     };
+
     let editingIndex = null;
     let editingData = null;
 
@@ -174,19 +144,15 @@
       document.getElementById('order').classList.add('hidden');
       document.getElementById('summary').classList.add('hidden');
       document.getElementById(sectionId).classList.remove('hidden');
-
-      if (sectionId === 'summary') {
-        renderSummary();
-      } else if (sectionId === 'order') {
+      if (sectionId === 'summary') renderSummary();
+      else if (sectionId === 'order') {
         generateBowlSections();
-
         if (editingData) {
           document.getElementById("numPeople").value = editingData.numPeople;
           document.getElementById("numBowls").value = editingData.numBowls;
           document.getElementById("whiteRice").value = editingData.whiteRice;
           document.getElementById("taroRice").value = editingData.taroRice;
           generateBowlSections();
-
           setTimeout(() => {
             editingData.bowls.forEach((bowl, i) => {
               document.querySelector(`input[name="b${i}_count"]`).value = bowl.count;
@@ -206,17 +172,15 @@
       const numBowls = parseInt(document.getElementById("numBowls").value);
       const area = document.getElementById("bowlDetails");
       area.innerHTML = '';
-
       const header = document.createElement("div");
       header.className = "subheader";
       header.textContent = "👇 请设置每碗汤的内容：";
       area.appendChild(header);
-
       for (let i = 0; i < numBowls; i++) {
         const div = document.createElement("div");
         div.className = "person-block";
-        div.innerHTML = `<h3>🥣 第 ${i + 1} 碗汤</h3>`;
-        div.innerHTML += `<label>这碗汤几人共用？</label>
+        div.innerHTML = `<h3>🥣 第 ${i + 1} 碗汤</h3>
+          <label>这碗汤几人共用？</label>
           <input type="number" name="b${i}_count" min="1" max="${numPeople}" value="1">
           <label>这碗汤不吃的材料：</label>`;
         ingredients.forEach(item => {
@@ -230,7 +194,6 @@
     function generateFinalOrder() {
       const orders = JSON.parse(localStorage.getItem("orders") || "[]");
       const today = new Date().toISOString().split("T")[0];
-
       let orderNumber;
       if (editingIndex === null) {
         orderNumber = (parseInt(localStorage.getItem("lastOrder") || "0") % 50) + 1;
@@ -238,36 +201,24 @@
       } else {
         orderNumber = orders[editingIndex].number;
       }
-
       const numPeople = parseInt(document.getElementById("numPeople").value);
       const numBowls = parseInt(document.getElementById("numBowls").value);
       const whiteRice = parseInt(document.getElementById("whiteRice").value);
       const taroRice = parseInt(document.getElementById("taroRice").value);
-
       let result = `📅 日期：${today}\n🧾 订单编号：${orderNumber}\n👥 用餐人数：${numPeople}\n🥣 汤共 ${numBowls} 碗\n`;
       const bowlData = [];
-
       for (let i = 0; i < numBowls; i++) {
         const count = document.querySelector(`input[name="b${i}_count"]`).value;
         const noItems = Array.from(document.querySelectorAll(`input[name="b${i}_no"]:checked`)).map(cb => cb.value);
         bowlData.push({ count, noItems });
         result += `🥣 第 ${i + 1} 碗 - ${count}人 共用 忌口：${noItems.length ? noItems.join("、") : "无"}\n`;
       }
-
       result += `\n🍚 白饭：${whiteRice} 碗\n🍚 芋头饭：${taroRice} 碗`;
       document.getElementById("finalOutput").innerHTML = `<div class="output">${result}</div>`;
-
       const newOrder = {
-        date: today,
-        number: orderNumber,
-        text: result,
-        numPeople,
-        numBowls,
-        whiteRice,
-        taroRice,
-        bowls: bowlData
+        date: today, number: orderNumber, text: result,
+        numPeople, numBowls, whiteRice, taroRice, bowls: bowlData
       };
-
       if (editingIndex !== null) {
         orders[editingIndex] = newOrder;
         editingIndex = null;
@@ -275,7 +226,6 @@
         orders.unshift(newOrder);
         orders.splice(50);
       }
-
       localStorage.setItem("orders", JSON.stringify(orders));
       showSection('summary');
     }
@@ -291,11 +241,7 @@
       orders.forEach((o, idx) => {
         const div = document.createElement("div");
         div.className = "order-entry";
-        div.innerHTML = `
-          <button class='edit-btn' onclick='editOrder(${idx})'>✏️ 编辑</button>
-          <button class='edit-btn' style="right: 80px; background:#e57373;" onclick='deleteOrder(${idx})'>🗑 删除</button>
-          <pre>${o.text}</pre>
-        `;
+        div.innerHTML = `<button class='edit-btn' onclick='editOrder(${idx})'>✏️ 编辑</button><pre>${o.text}</pre>`;
         area.appendChild(div);
       });
     }
@@ -319,15 +265,6 @@
       showSection("order");
     }
 
-    function deleteOrder(index) {
-      if (confirm("确定要删除这笔订单吗？此操作不可恢复。")) {
-        const orders = JSON.parse(localStorage.getItem("orders") || "[]");
-        orders.splice(index, 1);
-        localStorage.setItem("orders", JSON.stringify(orders));
-        renderSummary();
-      }
-    }
-
     window.addEventListener('DOMContentLoaded', () => {
       document.getElementById("numPeople").addEventListener("input", generateBowlSections);
       document.getElementById("numBowls").addEventListener("input", generateBowlSections);
@@ -336,6 +273,7 @@
   </script>
 </body>
 </html>
+
 
 
 
