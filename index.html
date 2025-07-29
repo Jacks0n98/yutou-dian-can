@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
   <title>大山脚芋头饭专卖店</title>
   <style>
     :root {
@@ -11,14 +11,21 @@
       --background: #FFF9F3;
       --card: #ffffff;
       --border-radius: 12px;
+      --font-base: 16px;
+      --font-large: 18px;
+      --btn-padding: 14px 24px;
     }
 
+    /* 基础样式 */
     body {
       font-family: "Segoe UI", "Noto Sans SC", sans-serif;
       background-color: var(--background);
       margin: 0;
       padding: 20px;
       color: #333;
+      font-size: var(--font-base);
+      line-height: 1.5;
+      -webkit-tap-highlight-color: transparent; /* 触控去掉高亮 */
     }
 
     h1, h2, h3 {
@@ -28,6 +35,7 @@
     h1 {
       font-size: 28px;
       margin-bottom: 20px;
+      text-align: center;
     }
 
     .section {
@@ -38,15 +46,20 @@
       display: inline-block;
       background-color: var(--primary);
       color: white;
-      padding: 12px 20px;
+      padding: var(--btn-padding);
       margin: 10px 5px;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       cursor: pointer;
       transition: background 0.3s ease;
+      font-size: var(--font-large);
+      min-width: 120px;
+      user-select: none;
+      touch-action: manipulation;
     }
 
-    .btn:hover {
+    .btn:hover,
+    .btn:active {
       background-color: #a06d48;
     }
 
@@ -56,64 +69,126 @@
 
     label {
       display: block;
-      margin: 10px 0 5px;
-      font-weight: bold;
+      margin: 12px 0 6px;
+      font-weight: 600;
+      font-size: var(--font-large);
+      user-select: none;
     }
 
     input[type="number"], textarea {
       width: 100%;
-      padding: 10px;
-      margin-bottom: 10px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+      border: 1.8px solid #ccc;
+      border-radius: 10px;
       box-sizing: border-box;
+      font-size: var(--font-large);
+      /* 数字输入控件更大，方便触摸 */
+    }
+
+    /* 复选框标签调整，触控更友好 */
+    input[type="checkbox"] {
+      width: 22px;
+      height: 22px;
+      vertical-align: middle;
+      cursor: pointer;
+      margin-right: 8px;
     }
 
     .person-block {
       background: var(--card);
-      border: 1px solid #ddd;
+      border: 1.8px solid #ddd;
       border-radius: var(--border-radius);
-      padding: 15px;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      padding: 20px 20px 25px;
+      margin-bottom: 28px;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.07);
+      font-size: var(--font-large);
     }
 
     .output {
       background: #f2f2f2;
-      padding: 15px;
+      padding: 18px;
       border-radius: var(--border-radius);
       white-space: pre-wrap;
       margin-top: 20px;
-      font-size: 15px;
+      font-size: var(--font-large);
+      line-height: 1.6;
     }
 
     .subheader {
-      font-size: 18px;
+      font-size: 20px;
       color: #7a4212;
-      margin: 20px 0 10px;
+      margin: 22px 0 14px;
+      font-weight: 700;
     }
 
     .order-entry {
       background: #fff;
-      border: 1px solid #ccc;
-      padding: 12px;
+      border: 1.8px solid #ccc;
+      padding: 18px 20px;
       border-radius: var(--border-radius);
-      margin-bottom: 15px;
+      margin-bottom: 20px;
       position: relative;
+      font-size: var(--font-large);
+      line-height: 1.5;
     }
 
     .edit-btn {
       position: absolute;
-      top: 10px;
-      right: 10px;
+      top: 14px;
+      right: 14px;
       background: #ccc;
       color: #000;
       border: none;
-      border-radius: 6px;
-      padding: 4px 8px;
+      border-radius: 8px;
+      padding: 6px 12px;
       cursor: pointer;
-      font-size: 12px;
+      font-size: 14px;
+      user-select: none;
+      touch-action: manipulation;
     }
+
+    /* 响应式布局：平板及以上宽度 */
+    @media (min-width: 768px) {
+      body {
+        padding: 30px 50px;
+      }
+
+      #order, #summary {
+        display: flex;
+        gap: 30px;
+      }
+
+      #order > div#bowlDetails {
+        flex: 2;
+        max-height: 80vh;
+        overflow-y: auto;
+        padding-right: 15px;
+        border-right: 2px solid var(--primary);
+      }
+
+      #order > div#orderForm {
+        flex: 1;
+        max-width: 300px;
+      }
+
+      /* 重新排列“创建新订单”里的input和label，包成orderForm */
+      #order > #orderForm {
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* summary区域多栏 */
+      #summaryArea {
+        max-height: 80vh;
+        overflow-y: auto;
+      }
+
+      .btn {
+        min-width: 140px;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -125,23 +200,26 @@
 
   <div id="order" class="hidden section">
     <h2>📝 创建新订单</h2>
-    <label>👥 用餐人数：</label>
-    <input type="number" id="numPeople" min="1" max="20" value="1">
+    <div id="orderForm">
+      <label>👥 用餐人数：</label>
+      <input type="number" id="numPeople" min="1" max="20" value="1" />
 
-    <label>🥣 共用几碗汤？</label>
-    <input type="number" id="numBowls" min="1" max="10" value="1">
+      <label>🥣 共用几碗汤？</label>
+      <input type="number" id="numBowls" min="1" max="10" value="1" />
+
+      <label>🍚 白饭几碗：</label>
+      <input type="number" id="whiteRice" min="0" value="0" />
+
+      <label>🍚 芋头饭几碗：</label>
+      <input type="number" id="taroRice" min="0" value="0" />
+
+      <button class="btn" onclick="generateFinalOrder()">✅ 提交订单</button>
+      <button class="btn" onclick="showSection('summary')">📋 查看订单总表</button>
+      <button class="btn" onclick="exportOrders()">📤 导出订单 (txt)</button>
+    </div>
 
     <div id="bowlDetails"></div>
 
-    <label>🍚 白饭几碗：</label>
-    <input type="number" id="whiteRice" min="0" value="0">
-
-    <label>🍚 芋头饭几碗：</label>
-    <input type="number" id="taroRice" min="0" value="0">
-
-    <button class="btn" onclick="generateFinalOrder()">✅ 提交订单</button>
-    <button class="btn" onclick="showSection('summary')">📋 查看订单总表</button>
-    <button class="btn" onclick="exportOrders()">📤 导出订单 (txt)</button>
     <div id="finalOutput"></div>
   </div>
 
@@ -322,6 +400,7 @@
   </script>
 </body>
 </html>
+
 
 
 
