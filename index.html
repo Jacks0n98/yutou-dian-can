@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>大山脚芋头饭专卖店</title>
   <style>
     :root {
@@ -21,9 +21,7 @@
       color: #333;
     }
 
-    h1,
-    h2,
-    h3 {
+    h1, h2, h3 {
       color: var(--primary);
     }
 
@@ -62,8 +60,7 @@
       font-weight: bold;
     }
 
-    input[type="number"],
-    textarea {
+    input[type="number"], textarea {
       width: 100%;
       padding: 10px;
       margin-bottom: 10px;
@@ -78,7 +75,7 @@
       border-radius: var(--border-radius);
       padding: 15px;
       margin-bottom: 20px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
 
     .output {
@@ -108,22 +105,8 @@
     .edit-btn {
       position: absolute;
       top: 10px;
-      right: 10px;
       background: #ccc;
       color: #000;
-      border: none;
-      border-radius: 6px;
-      padding: 4px 8px;
-      cursor: pointer;
-      font-size: 12px;
-      margin-left: 5px;
-    }
-    .delete-btn {
-      position: absolute;
-      top: 10px;
-      right: 50px;
-      background: #e74c3c;
-      color: #fff;
       border: none;
       border-radius: 6px;
       padding: 4px 8px;
@@ -142,18 +125,18 @@
   <div id="order" class="hidden section">
     <h2>📝 创建新订单</h2>
     <label>👥 用餐人数：</label>
-    <input type="number" id="numPeople" min="1" max="20" value="1" />
+    <input type="number" id="numPeople" min="1" max="20" value="1">
 
     <label>🥣 共用几碗汤？</label>
-    <input type="number" id="numBowls" min="1" max="10" value="1" />
+    <input type="number" id="numBowls" min="1" max="10" value="1">
 
     <div id="bowlDetails"></div>
 
     <label>🍚 白饭几碗：</label>
-    <input type="number" id="whiteRice" min="0" value="0" />
+    <input type="number" id="whiteRice" min="0" value="0">
 
     <label>🍚 芋头饭几碗：</label>
-    <input type="number" id="taroRice" min="0" value="0" />
+    <input type="number" id="taroRice" min="0" value="0">
 
     <button class="btn" onclick="generateFinalOrder()">✅ 提交订单</button>
     <button class="btn" onclick="showSection('summary')">📋 查看订单总表</button>
@@ -169,42 +152,31 @@
   </div>
 
   <script>
-    const ingredients = [
-      "猪肝",
-      "猪腰",
-      "猪肠",
-      "猪肚",
-      "猪舌头",
-      "瘦肉",
-      "肥肉",
-      "菜",
-      "肉丸",
-      "猪心"
-    ];
+    const ingredients = ["猪肝", "猪腰", "猪肠", "猪肚", "猪舌头", "瘦肉", "肥肉", "菜", "肉丸", "猪心"];
     const emojiMap = {
-      猪肝: "🫀",
-      猪腰: "🫘",
-      猪肠: "➰",
-      猪肚: "🫃",
-      猪舌头: "👅",
-      瘦肉: "🍖",
-      肥肉: "🥓",
-      菜: "🥬",
-      肉丸: "🍡",
-      猪心: "❤️‍🔥"
+      "猪肝": "🫀",
+      "猪腰": "🫘",
+      "猪肠": "➰",
+      "猪肚": "🫃",
+      "猪舌头": "👅",
+      "瘦肉": "🍖",
+      "肥肉": "🥓",
+      "菜": "🥬",
+      "肉丸": "🍡",
+      "猪心": "❤️"
     };
     let editingIndex = null;
     let editingData = null;
 
     function showSection(sectionId) {
-      document.getElementById("home").classList.add("hidden");
-      document.getElementById("order").classList.add("hidden");
-      document.getElementById("summary").classList.add("hidden");
-      document.getElementById(sectionId).classList.remove("hidden");
+      document.getElementById('home').classList.add('hidden');
+      document.getElementById('order').classList.add('hidden');
+      document.getElementById('summary').classList.add('hidden');
+      document.getElementById(sectionId).classList.remove('hidden');
 
-      if (sectionId === "summary") {
+      if (sectionId === 'summary') {
         renderSummary();
-      } else if (sectionId === "order") {
+      } else if (sectionId === 'order') {
         generateBowlSections();
 
         if (editingData) {
@@ -217,7 +189,7 @@
           setTimeout(() => {
             editingData.bowls.forEach((bowl, i) => {
               document.querySelector(`input[name="b${i}_count"]`).value = bowl.count;
-              bowl.noItems.forEach((item) => {
+              bowl.noItems.forEach(item => {
                 const cb = document.querySelector(`input[name="b${i}_no"][value="${item}"]`);
                 if (cb) cb.checked = true;
               });
@@ -232,7 +204,7 @@
       const numPeople = parseInt(document.getElementById("numPeople").value);
       const numBowls = parseInt(document.getElementById("numBowls").value);
       const area = document.getElementById("bowlDetails");
-      area.innerHTML = "";
+      area.innerHTML = '';
 
       const header = document.createElement("div");
       header.className = "subheader";
@@ -246,7 +218,7 @@
         div.innerHTML += `<label>这碗汤几人共用？</label>
           <input type="number" name="b${i}_count" min="1" max="${numPeople}" value="1">
           <label>这碗汤不吃的材料：</label>`;
-        ingredients.forEach((item) => {
+        ingredients.forEach(item => {
           const emoji = emojiMap[item] || "";
           div.innerHTML += `<label><input type="checkbox" name="b${i}_no" value="${item}"> ${emoji} ${item}</label>`;
         });
@@ -263,7 +235,7 @@
         orderNumber = (parseInt(localStorage.getItem("lastOrder") || "0") % 50) + 1;
         localStorage.setItem("lastOrder", orderNumber);
       } else {
-        orderNumber = editingIndex + 1;
+        orderNumber = orders[editingIndex].number;
       }
 
       const numPeople = parseInt(document.getElementById("numPeople").value);
@@ -271,65 +243,48 @@
       const whiteRice = parseInt(document.getElementById("whiteRice").value);
       const taroRice = parseInt(document.getElementById("taroRice").value);
 
-      if (!numPeople || numPeople < 1) {
-        alert("请输入正确的用餐人数！");
-        return;
-      }
-      if (!numBowls || numBowls < 1) {
-        alert("请输入正确的共用汤数！");
-        return;
-      }
+      let result = `📅 日期：${today}\n🧾 订单编号：${orderNumber}\n👥 用餐人数：${numPeople}\n🥣 汤共 ${numBowls} 碗\n`;
+      const bowlData = [];
 
-      const bowls = [];
       for (let i = 0; i < numBowls; i++) {
-        const count = parseInt(document.querySelector(`input[name="b${i}_count"]`).value) || 1;
-        const noItems = Array.from(document.querySelectorAll(`input[name="b${i}_no"]:checked`)).map((c) => c.value);
-        bowls.push({ count, noItems });
+        const count = document.querySelector(`input[name="b${i}_count"]`).value;
+        const noItems = Array.from(document.querySelectorAll(`input[name="b${i}_no"]:checked`)).map(cb => cb.value);
+        bowlData.push({ count, noItems });
+        result += `🥣 第 ${i + 1} 碗 - ${count}人 共用 忌口：${noItems.length ? noItems.join("、") : "无"}\n`;
       }
 
-      // 生成订单文本
-      let text = `第${orderNumber}号点单 (${today})\n`;
-      text += `用餐人数：${numPeople}人\n共用汤数：${numBowls}碗\n`;
+      result += `\n🍚 白饭：${whiteRice} 碗\n🍚 芋头饭：${taroRice} 碗`;
+      document.getElementById("finalOutput").innerHTML = `<div class="output">${result}</div>`;
 
-      bowls.forEach((bowl, i) => {
-        let line = `第${i + 1}碗汤：${bowl.count}人共用，`;
-        if (bowl.noItems.length) {
-          line += `不吃：${bowl.noItems.join("、")}`;
-        } else {
-          line += `全吃`;
-        }
-        text += line + "\n";
-      });
-
-      text += `白饭：${whiteRice}碗\n芋头饭：${taroRice}碗\n`;
-
-      // 订单对象
-      const orderObj = {
-        number: orderNumber,
+      const newOrder = {
         date: today,
+        number: orderNumber,
+        text: result,
         numPeople,
         numBowls,
         whiteRice,
         taroRice,
-        bowls,
-        text
+        bowls: bowlData
       };
 
       if (editingIndex !== null) {
-        orders[editingIndex] = orderObj;
+        orders[editingIndex] = newOrder;
         editingIndex = null;
       } else {
-        orders.push(orderObj);
+        orders.unshift(newOrder);
+        orders.splice(50);
       }
+
       localStorage.setItem("orders", JSON.stringify(orders));
-      alert("订单已保存！");
-      showSection("summary");
+      setTimeout(() => {
+        showSection('summary');
+      }, 100);
     }
 
     function renderSummary() {
       const orders = JSON.parse(localStorage.getItem("orders") || "[]");
       const area = document.getElementById("summaryArea");
-      area.innerHTML = "";
+      area.innerHTML = '';
       if (!orders.length) {
         area.innerHTML = '<div class="output">暂无订单</div>';
         return;
@@ -338,57 +293,49 @@
         const div = document.createElement("div");
         div.className = "order-entry";
         div.innerHTML = `
+          <button class='edit-btn' style="right: 60px;" onclick='deleteOrder(${idx})'>🗑️ 删除</button>
           <button class='edit-btn' onclick='editOrder(${idx})'>✏️ 编辑</button>
-          <button class='delete-btn' onclick='deleteOrder(${idx})'>🗑️ 删除</button>
-          <pre>${o.text}</pre>
-        `;
+          <pre>${o.text}</pre>`;
         area.appendChild(div);
       });
     }
 
-    function editOrder(index) {
+    function exportOrders() {
       const orders = JSON.parse(localStorage.getItem("orders") || "[]");
+      if (!orders.length) return alert("没有订单可导出。");
+      const blob = new Blob([orders.map(o => o.text).join("\n\n---------------------------\n\n")], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `订单总表_${new Date().toISOString().split("T")[0]}.txt`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function editOrder(index) {
       editingIndex = index;
+      const orders = JSON.parse(localStorage.getItem("orders") || "[]");
       editingData = orders[index];
       showSection("order");
     }
 
     function deleteOrder(index) {
-      if (!confirm("确定删除此订单吗？")) return;
-      let orders = JSON.parse(localStorage.getItem("orders") || "[]");
+      if (!confirm("确定要删除此订单吗？")) return;
+      const orders = JSON.parse(localStorage.getItem("orders") || "[]");
       orders.splice(index, 1);
       localStorage.setItem("orders", JSON.stringify(orders));
       renderSummary();
     }
 
-    function exportOrders() {
-      const orders = JSON.parse(localStorage.getItem("orders") || "[]");
-      if (!orders.length) {
-        alert("没有订单可导出！");
-        return;
-      }
-      let text = "";
-      orders.forEach((o) => {
-        text += o.text + "\n\n";
-      });
-      const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = `orders_${new Date().toISOString().slice(0, 10)}.txt`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-
-    // 初始化时生成第一碗汤输入框
-    document.getElementById("numBowls").addEventListener("change", generateBowlSections);
-    document.getElementById("numPeople").addEventListener("change", generateBowlSections);
-
-    // 初始化显示首页
-    showSection("home");
+    window.addEventListener('DOMContentLoaded', () => {
+      document.getElementById("numPeople").addEventListener("input", generateBowlSections);
+      document.getElementById("numBowls").addEventListener("input", generateBowlSections);
+      generateBowlSections();
+    });
   </script>
 </body>
 </html>
+
 
 
 
