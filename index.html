@@ -1,144 +1,98 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>大山脚芋头饭专卖店 点餐系统</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>大山脚芋头饭专卖店 - 简洁点餐系统</title>
   <style>
-    body { font-family: sans-serif; padding: 20px; background: #f8f8f8; }
+    body { font-family: sans-serif; background: #f8f8f8; padding: 20px; }
     h2 { color: #5a2d0c; }
-    label { display: block; margin-top: 8px; }
-    input[type="number"] { width: 60px; }
-    textarea { width: 100%; height: 50px; margin-top: 5px; }
-    .block { background: #fff; padding: 15px; margin-top: 15px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-    .output { white-space: pre-wrap; background: #eee; padding: 15px; border-radius: 6px; margin-top: 20px; }
-    button { margin-top: 20px; padding: 10px 15px; font-size: 16px; }
+    .section { background: #fff; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+    label { display: block; margin: 8px 0 4px; }
+    input[type="number"], textarea { width: 100%; padding: 5px; font-size: 16px; }
+    button { padding: 10px 15px; font-size: 16px; margin-top: 15px; }
+    .output { white-space: pre-wrap; background: #eee; padding: 15px; border-radius: 5px; margin-top: 20px; }
   </style>
 </head>
 <body>
 
-  <h2>大山脚芋头饭专卖店 点餐系统</h2>
+  <h2>🍠 大山脚芋头饭专卖店 - 点餐系统</h2>
 
-  <label>👥 用餐人数：<input type="number" id="numPeople" min="1" value="1"></label>
+  <div class="section">
+    <label for="numPeople">👥 用餐人数：</label>
+    <input type="number" id="numPeople" min="1" max="50" value="1">
 
-  <label>🥣 汤类选择：</label>
-  <label><input type="radio" name="soupType" value="single" checked> 每人一碗</label>
-  <label><input type="radio" name="soupType" value="shared"> 共用几碗</label>
+    <label for="numSoups">🥣 汤共用几碗：</label>
+    <input type="number" id="numSoups" min="1" max="10" value="1">
 
-  <div id="soupConfig"></div>
+    <div id="soupArea"></div>
 
-  <div class="block">
-    <h3>☕️ 饭类统计</h3>
-    <label>🍚 白饭数量：<input type="number" id="riceWhite" min="0" value="0"> 碗</label>
-    <label>🥠 芋头饭数量：<input type="number" id="riceTaro" min="0" value="0"> 碗</label>
-    <label>📌 饭类备注：<textarea id="riceNote"></textarea></label>
+    <label for="riceWhite">🍚 白饭几碗：</label>
+    <input type="number" id="riceWhite" min="0" value="0">
+
+    <label for="riceTaro">🍠 芋头饭几碗：</label>
+    <input type="number" id="riceTaro" min="0" value="0">
+
+    <label for="remark">📝 整单备注：</label>
+    <textarea id="remark" placeholder="如：不要辣、另外打包一碗饭等..."></textarea>
+
+    <button onclick="generateSummary()">✅ 生成订单</button>
   </div>
 
-  <div class="block">
-    <h3>设置各位项目</h3>
-    <div id="remarkArea"></div>
-  </div>
-
-  <button onclick="generateForm()">生成填表</button>
-  <button onclick="generateSummary()">生成点餐总结</button>
-
-  <div class="output" id="summary"></div>
+  <div class="output" id="summaryArea"></div>
 
   <script>
     const ingredients = ["猪肝", "猪腰", "猪肠", "猪肚", "猪舌头", "瘦肉", "肥肉", "菜", "肉丸"];
-    let soupGroups = [];
-    let orderNumber = parseInt(localStorage.getItem('orderNumber') || '0');
+    let orderNumber = parseInt(localStorage.getItem("orderNumber") || "0");
 
-    function generateForm() {
-      const num = parseInt(document.getElementById("numPeople").value);
-      const soupType = document.querySelector('input[name="soupType"]:checked').value;
-      const soupConfig = document.getElementById("soupConfig");
-      const remarkArea = document.getElementById("remarkArea");
-      soupConfig.innerHTML = '';
-      remarkArea.innerHTML = '';
+    document.getElementById("numSoups").addEventListener("input", generateSoupInputs);
 
-      if (soupType === 'shared') {
-        const block = document.createElement('div');
-        block.className = "block";
-        block.innerHTML = `<label>🥣 输入共用的汤碗数：<input type="number" id="soupBowls" min="1" value="1"></label>
-          <button onclick="generateSoupGroups()">设置每碗分组</button>
-          <div id="soupGroupInputs"></div>`;
-        soupConfig.appendChild(block);
-      }
+    function generateSoupInputs() {
+      const soupArea = document.getElementById("soupArea");
+      const count = parseInt(document.getElementById("numSoups").value);
+      soupArea.innerHTML = '';
 
-      for (let i = 0; i < num; i++) {
+      for (let i = 0; i < count; i++) {
         const div = document.createElement("div");
-        div.className = "block";
-        div.innerHTML = `👤 项目 - 顾客 ${i + 1}<br><textarea id="remark_${i}" placeholder="备注信息..."></textarea>`;
-        remarkArea.appendChild(div);
+        div.className = "section";
+        div.innerHTML = `<strong>🥣 第 ${i + 1} 碗汤</strong><br>
+          <label>👤 共用人数：</label>
+          <input type="number" min="1" max="20" id="soupPeople_${i}" value="1">
+          <label>❌ 忌口材料：</label>` +
+          ingredients.map(ing => `<label><input type="checkbox" name="soupNo_${i}" value="${ing}"> ${ing}</label>`).join('');
+        soupArea.appendChild(div);
       }
     }
 
-    function generateSoupGroups() {
-      const bowls = parseInt(document.getElementById("soupBowls").value);
-      const container = document.getElementById("soupGroupInputs");
-      soupGroups = [];
-      container.innerHTML = '';
-
-      for (let i = 0; i < bowls; i++) {
-        const block = document.createElement('div');
-        block.className = "block";
-        block.innerHTML = `<h4>🥣 汤${i + 1}</h4>
-          <label>共用人数：<input type="number" id="soup_${i}_count" min="1" value="1"></label>
-          <label>不吃材料：</label>
-          ${ingredients.map(item => `<label><input type="checkbox" name="soup_${i}_no" value="${item}"> ${item}</label>`).join('')}`;
-        container.appendChild(block);
-      }
-    }
+    generateSoupInputs();
 
     function generateSummary() {
-      const num = parseInt(document.getElementById("numPeople").value);
-      const soupType = document.querySelector('input[name="soupType"]:checked').value;
-      const white = parseInt(document.getElementById("riceWhite").value);
-      const taro = parseInt(document.getElementById("riceTaro").value);
-      const riceNote = document.getElementById("riceNote").value.trim();
-      const remarks = Array.from({ length: num }, (_, i) => document.getElementById(`remark_${i}`).value.trim());
-      let summary = [];
+      const numPeople = parseInt(document.getElementById("numPeople").value);
+      const numSoups = parseInt(document.getElementById("numSoups").value);
+      const riceWhite = parseInt(document.getElementById("riceWhite").value);
+      const riceTaro = parseInt(document.getElementById("riceTaro").value);
+      const remark = document.getElementById("remark").value.trim();
+      const today = new Date().toISOString().split('T')[0];
 
+      // 订单编号轮询 1~50
       orderNumber = (orderNumber % 50) + 1;
-      localStorage.setItem('orderNumber', orderNumber);
+      localStorage.setItem("orderNumber", orderNumber);
 
-      const today = new Date().toLocaleDateString();
-      summary.push(`📅 日期：${today}   订单号：#${orderNumber}`);
-      summary.push(`👥 用餐人数：${num} 人`);
+      let output = `📅 日期：${today}\n🧾 订单编号：${orderNumber}\n`;
+      output += `👥 用餐人数：${numPeople}人\n\n🥣 汤类分配：\n`;
 
-      if (soupType === 'single') {
-        summary.push(`🥣 每人一碗`);
-        for (let i = 0; i < num; i++) {
-          summary.push(`🍲 顾客${i + 1} 不吃：无`);
-        }
-      } else {
-        summary.push(`🥣 共用汤构成：`);
-        const bowls = parseInt(document.getElementById("soupBowls").value);
-        let totalCount = 0;
-        for (let i = 0; i < bowls; i++) {
-          const count = parseInt(document.getElementById(`soup_${i}_count`).value);
-          totalCount += count;
-          const noItems = Array.from(document.querySelectorAll(`input[name="soup_${i}_no"]:checked`)).map(cb => cb.value);
-          summary.push(`  【🥣 汤${i + 1}】 ${count}人共用  不吃：${noItems.length ? noItems.join(' 、') : "无"}`);
-        }
-        if (totalCount !== num) {
-          alert("[错误] 汤分组人数总和不等于用餐人数！");
-          return;
-        }
+      for (let i = 0; i < numSoups; i++) {
+        const soupCount = document.getElementById(`soupPeople_${i}`).value;
+        const noItems = Array.from(document.querySelectorAll(`input[name="soupNo_${i}"]:checked`)).map(cb => cb.value);
+        output += `  - 第 ${i + 1} 碗：${soupCount}人共用`;
+        output += noItems.length ? `（不吃：${noItems.join("、")}）` : '（无忌口）';
+        output += '\n';
       }
 
-      summary.push("\n🍚 饭类统计：");
-      summary.push(`  🍚 白饭：${white}碗`);
-      summary.push(`  🥠 芋头饭：${taro}碗`);
-      if (riceNote) summary.push(`  📌 备注：${riceNote}`);
+      output += `\n🍚 饭类：白饭 ${riceWhite} 碗，芋头饭 ${riceTaro} 碗\n`;
+      output += `\n📝 备注：${remark || "无"}\n`;
 
-      summary.push("\n📄 顾客备注：");
-      remarks.forEach((r, i) => {
-        if (r) summary.push(`  👤 顾客${i + 1}：${r}`);
-      });
-
-      document.getElementById("summary").textContent = summary.join("\n");
+      document.getElementById("summaryArea").textContent = output;
     }
   </script>
 
