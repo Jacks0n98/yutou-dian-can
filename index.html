@@ -5,17 +5,93 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>大山脚芋头饭专卖店</title>
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; background: #f9f9f9; }
-    h1, h2, h3 { color: #5a2d0c; }
-    .hidden { display: none; }
-    .section { margin-top: 30px; }
-    .btn { display: inline-block; margin: 10px 5px; padding: 10px 20px; background: #5a2d0c; color: #fff; border: none; border-radius: 5px; cursor: pointer; }
-    .btn:hover { background: #7a4212; }
-    .person-block { border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; background: #fff; border-radius: 5px; }
-    label { display: block; margin-top: 5px; }
-    textarea { width: 100%; height: 50px; margin-top: 5px; }
-    .output { white-space: pre-wrap; background: #eee; padding: 15px; border-radius: 5px; margin-top: 20px; }
-    .subheader { font-weight: bold; margin: 15px 0 10px; font-size: 16px; color: #7a4212; }
+    :root {
+      --primary: #8B5E3C;
+      --secondary: #F4E4D4;
+      --background: #FFF9F3;
+      --card: #ffffff;
+      --border-radius: 12px;
+    }
+
+    body {
+      font-family: "Segoe UI", "Noto Sans SC", sans-serif;
+      background-color: var(--background);
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+
+    h1, h2, h3 {
+      color: var(--primary);
+    }
+
+    h1 {
+      font-size: 28px;
+      margin-bottom: 20px;
+    }
+
+    .section {
+      margin-top: 30px;
+    }
+
+    .btn {
+      display: inline-block;
+      background-color: var(--primary);
+      color: white;
+      padding: 12px 20px;
+      margin: 10px 5px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .btn:hover {
+      background-color: #a06d48;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    label {
+      display: block;
+      margin: 10px 0 5px;
+      font-weight: bold;
+    }
+
+    input[type="number"], textarea {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      box-sizing: border-box;
+    }
+
+    .person-block {
+      background: var(--card);
+      border: 1px solid #ddd;
+      border-radius: var(--border-radius);
+      padding: 15px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .output {
+      background: #f2f2f2;
+      padding: 15px;
+      border-radius: var(--border-radius);
+      white-space: pre-wrap;
+      margin-top: 20px;
+      font-size: 15px;
+    }
+
+    .subheader {
+      font-size: 18px;
+      color: #7a4212;
+      margin: 20px 0 10px;
+    }
   </style>
 </head>
 <body>
@@ -45,12 +121,14 @@
 
     <button class="btn" onclick="generateFinalOrder()">✅ 提交订单</button>
     <button class="btn" onclick="showSection('summary')">📋 查看订单总表</button>
+    <button class="btn" onclick="exportOrders()">📤 导出订单 (txt)</button>
     <div id="finalOutput"></div>
   </div>
 
   <div id="summary" class="hidden section">
     <h2>📋 订单总表</h2>
     <button class="btn" onclick="showSection('order')">⬅ 返回点餐</button>
+    <button class="btn" onclick="exportOrders()">📤 导出订单 (txt)</button>
     <div id="summaryArea"></div>
   </div>
 
@@ -86,9 +164,10 @@
         div.className = "person-block";
         div.innerHTML = `<h3>🥣 第 ${i + 1} 碗汤</h3>`;
 
-        div.innerHTML += `<strong>这碗汤几人共用？</strong><br>
-          <input type="number" name="b${i}_count" min="1" max="${numPeople}" value="1"><br><br>
-          <strong>这碗汤不吃的材料：</strong><br>`;
+        div.innerHTML += `<label>这碗汤几人共用？</label>
+          <input type="number" name="b${i}_count" min="1" max="${numPeople}" value="1">
+          <label>这碗汤不吃的材料：</label>`;
+
         ingredients.forEach(item => {
           div.innerHTML += `<label><input type="checkbox" name="b${i}_no" value="${item}"> ${item}</label>`;
         });
@@ -128,7 +207,18 @@
       document.getElementById("summaryArea").innerHTML = `<div class="output">${all || "暂无订单"}</div>`;
     }
 
-    // 自动更新碗区块监听
+    function exportOrders() {
+      const orders = JSON.parse(localStorage.getItem("orders") || "[]");
+      if (!orders.length) return alert("没有订单可导出。");
+      const blob = new Blob([orders.map(o => o.text).join("\n\n---------------------------\n\n")], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `订单总表_${new Date().toISOString().split("T")[0]}.txt`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
       document.getElementById("numPeople").addEventListener("input", generateBowlSections);
       document.getElementById("numBowls").addEventListener("input", generateBowlSections);
@@ -137,5 +227,3 @@
   </script>
 </body>
 </html>
-
-
