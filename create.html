@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>创建订单 - 芋头饭专卖店</title>
+  <style>
+    body {
+      font-family: "Noto Sans SC", sans-serif;
+      background: #fff9f3;
+      padding: 20px;
+      color: #333;
+    }
+    h2 {
+      color: #8b5e3c;
+    }
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      background: #a4724c;
+      color: white;
+      border-radius: 10px;
+      cursor: pointer;
+      margin: 10px 5px;
+    }
+    .input {
+      margin: 10px 0;
+      display: block;
+    }
+    .group {
+      border: 1px solid #ddd;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 12px;
+      background: #fff;
+    }
+    .output {
+      margin-top: 20px;
+      white-space: pre-wrap;
+      background: #f4e4d4;
+      padding: 15px;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h2>🍽 创建订单</h2>
+
+  <label class="input">用餐人数：<input type="number" id="numPeople" min="1" max="20" /></label>
+  <label class="input">共用几碗汤：<input type="number" id="numBowls" min="1" /></label>
+  <label class="input">白饭几碗：<input type="number" id="riceWhite" min="0" /></label>
+  <label class="input">芋头饭几碗：<input type="number" id="riceTaro" min="0" /></label>
+  <button class="btn" onclick="generateGroups()">下一步</button>
+
+  <form id="orderForm" onsubmit="submitOrder(event)"></form>
+
+  <script>
+    const ingredients = [
+      { name: "猪肝", emoji: "🥕" },
+      { name: "猪腰", emoji: "🤢" },
+      { name: "猪肠", emoji: "🥽" },
+      { name: "猪肚", emoji: "🤮" },
+      { name: "猪舌头", emoji: "🧠" },
+      { name: "瘦肉", emoji: "🥩" },
+      { name: "肥肉", emoji: "🥠" },
+      { name: "菜", emoji: "🌿" },
+      { name: "肉丸", emoji: "🥝" },
+      { name: "猪心", emoji: "❤️" }
+    ];
+
+    function generateGroups() {
+      const numPeople = parseInt(document.getElementById("numPeople").value);
+      const numBowls = parseInt(document.getElementById("numBowls").value);
+      const form = document.getElementById("orderForm");
+      form.innerHTML = "";
+
+      for (let i = 0; i < numBowls; i++) {
+        const group = document.createElement("div");
+        group.className = "group";
+        group.innerHTML = `<h3>第 ${i + 1} 碗 - 分给几人：</h3>`;
+
+        const select = document.createElement("input");
+        select.type = "number";
+        select.name = `groupPeople${i}`;
+        select.value = 1;
+        select.min = 1;
+        select.max = numPeople;
+        group.appendChild(select);
+
+        const ingredientsText = document.createElement("div");
+        ingredientsText.innerHTML = `<p>以下食材不吃：</p>`;
+        ingredients.forEach(ing => {
+          const label = document.createElement("label");
+          label.innerHTML = `<input type="checkbox" name="group${i}_no_${ing.name}" /> ${ing.emoji} ${ing.name}`;
+          ingredientsText.appendChild(label);
+        });
+        group.appendChild(ingredientsText);
+
+        form.appendChild(group);
+      }
+
+      const submitBtn = document.createElement("button");
+      submitBtn.textContent = "提交订单";
+      submitBtn.className = "btn";
+      submitBtn.type = "submit";
+      form.appendChild(submitBtn);
+    }
+
+    function submitOrder(e) {
+      e.preventDefault();
+      const date = new Date().toLocaleDateString();
+      const orderNum = parseInt(localStorage.getItem("orderNum") || "0") + 1;
+      localStorage.setItem("orderNum", orderNum > 50 ? 1 : orderNum);
+      const riceWhite = document.getElementById("riceWhite").value;
+      const riceTaro = document.getElementById("riceTaro").value;
+      const formData = new FormData(document.getElementById("orderForm"));
+      let text = `\u2705 订单编号：${orderNum}\n日期：${date}\n\n白饭：${riceWhite} 碗\n芋头饭：${riceTaro} 碗\n`;
+      for (let [key, val] of formData.entries()) {
+        if (val === "on") {
+          const [group, , name] = key.split("_");
+          text += `第 ${parseInt(group.replace("group", "")) + 1} 碗不吃：${name}\n`;
+        }
+      }
+      const orders = JSON.parse(localStorage.getItem("orders") || "[]");
+      orders.push({ id: orderNum, date, content: text });
+      localStorage.setItem("orders", JSON.stringify(orders));
+      alert("订单已提交！");
+      window.location.href = "orders.html";
+    }
+  </script>
+</body>
+</html>
