@@ -1,99 +1,160 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="zh">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>大山脚芋头饭专卖店 点餐系统</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>大山脚芋头饭专卖店</title>
   <style>
-    body { font-family: sans-serif; padding: 20px; background: #f5f5f5; }
-    label, input, select, textarea { display: block; margin: 10px 0; }
-    .group-block { padding: 10px; background: #fff; margin-bottom: 15px; border-radius: 6px; border: 1px solid #ccc; }
-    button { padding: 10px 15px; }
+    body { font-family: sans-serif; margin: 0; padding: 20px; background: #fefefe; }
+    h1, h2 { text-align: center; color: #5a2d0c; }
+    .button { display: block; width: 100%; max-width: 300px; margin: 10px auto; padding: 15px; background: #8e5b3c; color: #fff; border: none; border-radius: 10px; font-size: 18px; cursor: pointer; }
+    .section { display: none; }
+    .person-block, .bowl-block { border: 1px solid #ccc; padding: 15px; margin: 10px 0; border-radius: 5px; background: #fff; }
+    label { display: block; margin-top: 5px; }
+    textarea { width: 100%; height: 40px; margin-top: 5px; }
     .output { white-space: pre-wrap; background: #eee; padding: 15px; border-radius: 5px; margin-top: 20px; }
+    .back-btn { background: #aaa; }
   </style>
 </head>
 <body>
-  <h2>大山脚芋头饭专卖店 点餐系统</h2>
 
-  <label>用餐人数：<input type="number" id="numPeople" min="1" value="1"></label>
-  <label>共用汤米几碗：<input type="number" id="numSoups" min="1" value="1"></label>
+  <h1>🍲 大山脚芋头饭专卖店</h1>
 
-  <div id="soupGroupArea"></div>
+  <!-- 首页菜单 -->
+  <div id="homeSection">
+    <button class="button" onclick="showSection('orderFormSection')">📝 创建新订单</button>
+    <button class="button" onclick="showSection('orderListSection'); loadOrders()">📋 查看订单总表</button>
+  </div>
 
-  <label>白饭几碗：<input type="number" id="whiteRice" min="0" value="0"></label>
-  <label>芋头饭几碗：<input type="number" id="taroRice" min="0" value="0"></label>
+  <!-- 创建订单 -->
+  <div id="orderFormSection" class="section">
+    <button class="button back-btn" onclick="showSection('homeSection')">⬅ 返回首页</button>
 
-  <label>总体评论：<textarea id="remarks"></textarea></label>
+    <label>请输入用餐人数：</label>
+    <input type="number" id="numPeople" min="1" max="20" value="1"/>
 
-  <button onclick="generateSoupGroups()">生成汤分配</button>
-  <button onclick="submitOrder()">上传订单</button>
+    <label>请输入总共几碗汤（可多人共用）：</label>
+    <input type="number" id="numBowls" min="1" max="10" value="1"/>
 
-  <div id="summary" class="output"></div>
+    <label>白饭几碗：</label>
+    <input type="number" id="whiteRice" min="0" value="0"/>
+
+    <label>芋头饭几碗：</label>
+    <input type="number" id="yamRice" min="0" value="0"/>
+
+    <button class="button" onclick="generateSoupBowlForms()">下一步</button>
+
+    <div id="soupFormsArea"></div>
+    <div id="finalSubmitArea"></div>
+  </div>
+
+  <!-- 查看订单总表 -->
+  <div id="orderListSection" class="section">
+    <button class="button back-btn" onclick="showSection('homeSection')">⬅ 返回首页</button>
+    <h2>📋 订单总表</h2>
+    <div id="orderSummaryList" class="output"></div>
+  </div>
 
   <script>
     const ingredients = ["猪肝", "猪腰", "猪肠", "猪肚", "猪舌头", "瘦肉", "肥肉", "菜", "肉丸"];
-    let orderId = Number(localStorage.getItem("currentOrderId")) || 1;
 
-    function generateSoupGroups() {
-      const area = document.getElementById("soupGroupArea");
-      const soupCount = parseInt(document.getElementById("numSoups").value);
-      area.innerHTML = "";
-      for (let i = 0; i < soupCount; i++) {
+    function showSection(id) {
+      document.querySelectorAll(".section").forEach(div => div.style.display = "none");
+      document.getElementById(id).style.display = "block";
+    }
+
+    function generateSoupBowlForms() {
+      const numPeople = parseInt(document.getElementById("numPeople").value);
+      const numBowls = parseInt(document.getElementById("numBowls").value);
+      const area = document.getElementById("soupFormsArea");
+      const finalArea = document.getElementById("finalSubmitArea");
+      area.innerHTML = '';
+      finalArea.innerHTML = '';
+
+      for (let b = 0; b < numBowls; b++) {
         const div = document.createElement("div");
-        div.className = "group-block";
-        div.innerHTML = `<h4>第 ${i+1} 碗</h4>
-          <label>几位共用：<input type="number" name="group_people" min="1" value="1"></label>
-          <label>不吃材料：</label>`;
-        ingredients.forEach(item => {
-          div.innerHTML += `<label><input type="checkbox" name="group_${i}_no" value="${item}"> ${item}</label>`;
-        });
+        div.className = "bowl-block";
+        div.innerHTML = `<h3>🍲 第 ${b + 1} 碗汤</h3>`;
+        div.innerHTML += `<label>这碗汤共几人共用？</label>
+          <input type="number" name="b${b}_count" min="1" max="${numPeople}" value="1" />`;
+
+        for (let p = 0; p < numPeople; p++) {
+          const pBlock = document.createElement("div");
+          pBlock.className = "person-block";
+          pBlock.innerHTML = `<strong>顾客 ${p + 1}（如属于此碗汤，可填写）</strong><br>`;
+          ingredients.forEach(item => {
+            pBlock.innerHTML += `<label><input type="checkbox" name="b${b}_p${p}_no" value="${item}"> 不吃 ${item}</label>`;
+          });
+          div.appendChild(pBlock);
+        }
+
         area.appendChild(div);
       }
+
+      const btn = document.createElement("button");
+      btn.className = "button";
+      btn.textContent = "✅ 提交订单并保存";
+      btn.onclick = submitFinalOrder;
+      finalArea.appendChild(btn);
     }
 
-    function submitOrder() {
-      const people = document.getElementById("numPeople").value;
-      const soupCount = parseInt(document.getElementById("numSoups").value);
-      const white = document.getElementById("whiteRice").value;
-      const taro = document.getElementById("taroRice").value;
-      const remark = document.getElementById("remarks").value;
+    function submitFinalOrder() {
+      const numPeople = parseInt(document.getElementById("numPeople").value);
+      const numBowls = parseInt(document.getElementById("numBowls").value);
+      const whiteRice = parseInt(document.getElementById("whiteRice").value);
+      const yamRice = parseInt(document.getElementById("yamRice").value);
+      const today = new Date().toISOString().slice(0, 10);
 
-      const groups = [];
-      for (let i = 0; i < soupCount; i++) {
-        const num = document.getElementsByName("group_people")[i].value;
-        const noItems = Array.from(document.querySelectorAll(`input[name="group_${i}_no"]:checked`)).map(cb => cb.value);
-        groups.push({ bowl: i + 1, people: num, noItems });
+      // 获取轮询编号
+      let lastIndex = parseInt(localStorage.getItem("lastOrderIndex") || "0");
+      lastIndex = lastIndex >= 50 ? 1 : lastIndex + 1;
+      localStorage.setItem("lastOrderIndex", lastIndex);
+
+      const summary = [];
+      summary.push(`🧾 订单日期：${today}`);
+      summary.push(`📌 订单编号：${lastIndex}`);
+      summary.push(`👥 用餐人数：${numPeople}`);
+      summary.push(`🍚 白饭：${whiteRice} 碗，芋头饭：${yamRice} 碗`);
+      summary.push(`🍲 汤碗数：${numBowls} 碗\n`);
+
+      for (let b = 0; b < numBowls; b++) {
+        const bowlCount = document.querySelector(`input[name="b${b}_count"]`).value;
+        summary.push(`第 ${b + 1} 碗（共 ${bowlCount} 人）：`);
+
+        for (let p = 0; p < numPeople; p++) {
+          const checkboxes = document.querySelectorAll(`input[name="b${b}_p${p}_no"]:checked`);
+          if (checkboxes.length) {
+            const avoid = Array.from(checkboxes).map(cb => cb.value).join("、");
+            summary.push(` - 顾客 ${p + 1} 不吃：${avoid}`);
+          }
+        }
+        summary.push('');
       }
 
-      const now = new Date();
-      const dateStr = now.toISOString().split("T")[0];
-      const order = {
-        id: orderId,
-        date: dateStr,
-        people,
-        white,
-        taro,
-        groups,
-        remark
-      };
+      // 存储订单
+      const allOrders = JSON.parse(localStorage.getItem("orders") || "[]");
+      allOrders.push({ id: lastIndex, date: today, content: summary.join('\n') });
+      localStorage.setItem("orders", JSON.stringify(allOrders));
 
-      const orders = JSON.parse(localStorage.getItem("orders") || "[]");
-      orders.push(order);
-      localStorage.setItem("orders", JSON.stringify(orders));
-
-      orderId = orderId >= 50 ? 1 : orderId + 1;
-      localStorage.setItem("currentOrderId", orderId);
-
-      let output = `订单编号: ${order.id}\n日期: ${dateStr}\n👥 用餐人数: ${people} 人\n\n🍚 饭量\n- 白饭: ${white} 碗\n- 芋头饭: ${taro} 碗\n\n🍲 汤分配:`;
-      groups.forEach(g => {
-        output += `\n- 第 ${g.bowl} 碗：${g.people} 人，不吃: ${g.noItems.length ? g.noItems.join(", ") : "无"}`;
-      });
-      output += `\n\n备注: ${remark || "无"}`;
-
-      document.getElementById("summary").textContent = output;
-      alert("订单已保存到系统");
+      alert("✅ 订单提交成功！");
+      showSection("orderListSection");
+      loadOrders();
     }
+
+    function loadOrders() {
+      const listDiv = document.getElementById("orderSummaryList");
+      const allOrders = JSON.parse(localStorage.getItem("orders") || "[]");
+      if (!allOrders.length) {
+        listDiv.textContent = "暂无订单。";
+        return;
+      }
+      const text = allOrders.map(o => o.content).join("\n----------------------\n\n");
+      listDiv.textContent = text;
+    }
+
+    // 默认显示首页
+    showSection("homeSection");
   </script>
 </body>
 </html>
+
