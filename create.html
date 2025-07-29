@@ -3,48 +3,98 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>大山脚芋头饭专卖店</title>
+  <title>订单总表 - 大山脚芋头饭专卖店</title>
   <style>
     body {
       font-family: "Noto Sans SC", "Segoe UI", sans-serif;
-      background-color: #fff8f0;
-      margin: 0;
+      background-color: #f9f9f9;
       padding: 20px;
     }
 
     h1 {
-      color: #6b3e26;
-      font-size: 28px;
+      color: #4a2c1a;
+      font-size: 24px;
       margin-bottom: 20px;
     }
 
-    .btn {
-      display: inline-block;
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      background: white;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    th, td {
+      padding: 12px 16px;
+      border-bottom: 1px solid #ddd;
+      text-align: left;
+    }
+
+    th {
       background-color: #a47148;
       color: white;
-      padding: 12px 20px;
-      margin: 10px 10px 0 0;
+    }
+
+    tr:hover {
+      background-color: #f1f1f1;
+    }
+
+    .btn-delete {
+      background-color: #d9534f;
+      color: white;
       border: none;
-      border-radius: 10px;
+      padding: 5px 10px;
       cursor: pointer;
-      font-size: 16px;
+      border-radius: 4px;
     }
 
-    .btn:hover {
-      background-color: #8b5a38;
-    }
-
-    .section {
-      margin-top: 30px;
+    .btn-delete:hover {
+      background-color: #c9302c;
     }
   </style>
 </head>
 <body>
-  <h1>大山脚芋头饭专卖店</h1>
-  <div class="section">
-    <button class="btn" onclick="location.href='create.html'">🍽 创建订单</button>
-    <button class="btn" onclick="location.href='orders.html'">📋 订单总表</button>
-  </div>
+  <h1>📋 订单总表</h1>
+  <table id="ordersTable">
+    <thead>
+      <tr>
+        <th>订单编号</th>
+        <th>日期</th>
+        <th>共用信息</th>
+        <th>饭类</th>
+        <th>不吃材料</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    const orders = JSON.parse(localStorage.getItem("orders") || "[]");
+    const tbody = document.querySelector("#ordersTable tbody");
+
+    orders.forEach((order, index) => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${order.id}</td>
+        <td>${order.date}</td>
+        <td>${order.sharing}</td>
+        <td>${order.rice}</td>
+        <td>${order.ingredients}</td>
+        <td><button class="btn-delete" onclick="deleteOrder(${index})">删除</button></td>
+      `;
+      tbody.appendChild(row);
+    });
+
+    function deleteOrder(index) {
+      if (confirm("确定要删除这个订单吗？")) {
+        orders.splice(index, 1);
+        localStorage.setItem("orders", JSON.stringify(orders));
+        location.reload();
+      }
+    }
+  </script>
 </body>
 </html>
+
 
