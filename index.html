@@ -92,12 +92,32 @@
       color: #7a4212;
       margin: 20px 0 10px;
     }
+
+    .order-entry {
+      background: #fff;
+      border: 1px solid #ccc;
+      padding: 12px;
+      border-radius: var(--border-radius);
+      margin-bottom: 15px;
+      position: relative;
+    }
+
+    .edit-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #ccc;
+      color: #000;
+      border: none;
+      border-radius: 6px;
+      padding: 4px 8px;
+      cursor: pointer;
+      font-size: 12px;
+    }
   </style>
 </head>
 <body>
-
   <h1>🍲 大山脚芋头饭专卖店</h1>
-
   <div id="home">
     <button class="btn" onclick="showSection('order')">📝 创建新订单</button>
     <button class="btn" onclick="showSection('summary')">📋 查看订单总表</button>
@@ -163,11 +183,9 @@
         const div = document.createElement("div");
         div.className = "person-block";
         div.innerHTML = `<h3>🥣 第 ${i + 1} 碗汤</h3>`;
-
         div.innerHTML += `<label>这碗汤几人共用？</label>
           <input type="number" name="b${i}_count" min="1" max="${numPeople}" value="1">
           <label>这碗汤不吃的材料：</label>`;
-
         ingredients.forEach(item => {
           div.innerHTML += `<label><input type="checkbox" name="b${i}_no" value="${item}"> ${item}</label>`;
         });
@@ -186,25 +204,36 @@
       const whiteRice = document.getElementById("whiteRice").value;
       const taroRice = document.getElementById("taroRice").value;
 
-      let result = `🧾 大山脚芋头饭专卖店\n📅 日期：${today}\n🧾 订单编号：${orderNumber}\n👥 用餐人数：${numPeople}\n🥣 共用汤：${numBowls} 碗\n`;
+      let result = `📅 日期：${today}\n🧾 订单编号：${orderNumber}\n👥 用餐人数：${numPeople}\n🥣 汤共 ${numBowls} 碗\n`;
 
       for (let i = 0; i < numBowls; i++) {
         const count = document.querySelector(`input[name="b${i}_count"]`).value;
         const noItems = Array.from(document.querySelectorAll(`input[name="b${i}_no"]:checked`)).map(cb => cb.value);
-        result += `  🥣 第 ${i + 1} 碗 - ${count}人  忌口：${noItems.length ? noItems.join("、") : "无"}\n`;
+        result += `🥣 第 ${i + 1} 碗 - ${count}人 共用 忌口：${noItems.length ? noItems.join("、") : "无"}\n`;
       }
 
       result += `\n🍚 白饭：${whiteRice} 碗\n🍚 芋头饭：${taroRice} 碗`;
-
       document.getElementById("finalOutput").innerHTML = `<div class="output">${result}</div>`;
+
       orders.unshift({ date: today, number: orderNumber, text: result });
       localStorage.setItem("orders", JSON.stringify(orders.slice(0, 50)));
+      showSection('summary');
     }
 
     function renderSummary() {
       const orders = JSON.parse(localStorage.getItem("orders") || "[]");
-      let all = orders.map(o => o.text).join("\n\n---------------------------\n\n");
-      document.getElementById("summaryArea").innerHTML = `<div class="output">${all || "暂无订单"}</div>`;
+      const area = document.getElementById("summaryArea");
+      area.innerHTML = '';
+      if (!orders.length) {
+        area.innerHTML = '<div class="output">暂无订单</div>';
+        return;
+      }
+      orders.forEach((o, idx) => {
+        const div = document.createElement("div");
+        div.className = "order-entry";
+        div.innerHTML = `<button class='edit-btn' onclick='editOrder(${idx})'>✏️ 编辑</button><pre>${o.text}</pre>`;
+        area.appendChild(div);
+      });
     }
 
     function exportOrders() {
@@ -219,6 +248,17 @@
       URL.revokeObjectURL(url);
     }
 
+    function editOrder(index) {
+      const orders = JSON.parse(localStorage.getItem("orders") || "[]");
+      const current = orders[index];
+      const newText = prompt("编辑订单内容：", current.text);
+      if (newText !== null) {
+        orders[index].text = newText;
+        localStorage.setItem("orders", JSON.stringify(orders));
+        renderSummary();
+      }
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
       document.getElementById("numPeople").addEventListener("input", generateBowlSections);
       document.getElementById("numBowls").addEventListener("input", generateBowlSections);
@@ -227,3 +267,4 @@
   </script>
 </body>
 </html>
+
