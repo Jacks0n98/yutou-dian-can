@@ -154,7 +154,19 @@
 
   <script>
     const ingredients = ["猪肝", "猪腰", "猪肠", "猪肚", "猪舌头", "瘦肉", "肥肉", "菜", "肉丸"];
+    const emojiMap = {
+      "猪肝": "🫀",
+      "猪腰": "🫘",
+      "猪肠": "➰",
+      "猪肚": "🫃",
+      "猪舌头": "👅",
+      "瘦肉": "🍖",
+      "肥肉": "🥓",
+      "菜": "🥬",
+      "肉丸": "🍡"
+    };
     let editingIndex = null;
+    let editingData = null;
 
     function showSection(sectionId) {
       document.getElementById('home').classList.add('hidden');
@@ -166,6 +178,25 @@
         renderSummary();
       } else if (sectionId === 'order') {
         generateBowlSections();
+
+        if (editingData) {
+          document.getElementById("numPeople").value = editingData.numPeople;
+          document.getElementById("numBowls").value = editingData.numBowls;
+          document.getElementById("whiteRice").value = editingData.whiteRice;
+          document.getElementById("taroRice").value = editingData.taroRice;
+          generateBowlSections();
+
+          setTimeout(() => {
+            editingData.bowls.forEach((bowl, i) => {
+              document.querySelector(`input[name="b${i}_count"]`).value = bowl.count;
+              bowl.noItems.forEach(item => {
+                const cb = document.querySelector(`input[name="b${i}_no"][value="${item}"]`);
+                if (cb) cb.checked = true;
+              });
+            });
+            editingData = null;
+          }, 100);
+        }
       }
     }
 
@@ -188,7 +219,8 @@
           <input type="number" name="b${i}_count" min="1" max="${numPeople}" value="1">
           <label>这碗汤不吃的材料：</label>`;
         ingredients.forEach(item => {
-          div.innerHTML += `<label><input type="checkbox" name="b${i}_no" value="${item}"> ${item}</label>`;
+          const emoji = emojiMap[item] || "";
+          div.innerHTML += `<label><input type="checkbox" name="b${i}_no" value="${item}"> ${emoji} ${item}</label>`;
         });
         area.appendChild(div);
       }
@@ -206,23 +238,35 @@
         orderNumber = orders[editingIndex].number;
       }
 
-      const numPeople = document.getElementById("numPeople").value;
-      const numBowls = document.getElementById("numBowls").value;
-      const whiteRice = document.getElementById("whiteRice").value;
-      const taroRice = document.getElementById("taroRice").value;
+      const numPeople = parseInt(document.getElementById("numPeople").value);
+      const numBowls = parseInt(document.getElementById("numBowls").value);
+      const whiteRice = parseInt(document.getElementById("whiteRice").value);
+      const taroRice = parseInt(document.getElementById("taroRice").value);
 
       let result = `📅 日期：${today}\n🧾 订单编号：${orderNumber}\n👥 用餐人数：${numPeople}\n🥣 汤共 ${numBowls} 碗\n`;
+      const bowlData = [];
 
       for (let i = 0; i < numBowls; i++) {
         const count = document.querySelector(`input[name="b${i}_count"]`).value;
         const noItems = Array.from(document.querySelectorAll(`input[name="b${i}_no"]:checked`)).map(cb => cb.value);
+        bowlData.push({ count, noItems });
         result += `🥣 第 ${i + 1} 碗 - ${count}人 共用 忌口：${noItems.length ? noItems.join("、") : "无"}\n`;
       }
 
       result += `\n🍚 白饭：${whiteRice} 碗\n🍚 芋头饭：${taroRice} 碗`;
       document.getElementById("finalOutput").innerHTML = `<div class="output">${result}</div>`;
 
-      const newOrder = { date: today, number: orderNumber, text: result };
+      const newOrder = {
+        date: today,
+        number: orderNumber,
+        text: result,
+        numPeople,
+        numBowls,
+        whiteRice,
+        taroRice,
+        bowls: bowlData
+      };
+
       if (editingIndex !== null) {
         orders[editingIndex] = newOrder;
         editingIndex = null;
@@ -265,6 +309,8 @@
 
     function editOrder(index) {
       editingIndex = index;
+      const orders = JSON.parse(localStorage.getItem("orders") || "[]");
+      editingData = orders[index];
       showSection("order");
     }
 
@@ -276,3 +322,4 @@
   </script>
 </body>
 </html>
+
