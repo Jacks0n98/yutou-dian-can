@@ -2,7 +2,7 @@
 <html lang="zh">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>大山脚芋头饭专卖店</title>
   <style>
     :root {
@@ -11,21 +11,14 @@
       --background: #FFF9F3;
       --card: #ffffff;
       --border-radius: 12px;
-      --font-base: 16px;
-      --font-large: 18px;
-      --btn-padding: 14px 24px;
     }
 
-    /* 基础样式 */
     body {
       font-family: "Segoe UI", "Noto Sans SC", sans-serif;
       background-color: var(--background);
       margin: 0;
       padding: 20px;
       color: #333;
-      font-size: var(--font-base);
-      line-height: 1.5;
-      -webkit-tap-highlight-color: transparent; /* 触控去掉高亮 */
     }
 
     h1, h2, h3 {
@@ -35,7 +28,6 @@
     h1 {
       font-size: 28px;
       margin-bottom: 20px;
-      text-align: center;
     }
 
     .section {
@@ -46,20 +38,15 @@
       display: inline-block;
       background-color: var(--primary);
       color: white;
-      padding: var(--btn-padding);
+      padding: 12px 20px;
       margin: 10px 5px;
       border: none;
-      border-radius: 10px;
+      border-radius: 8px;
       cursor: pointer;
       transition: background 0.3s ease;
-      font-size: var(--font-large);
-      min-width: 120px;
-      user-select: none;
-      touch-action: manipulation;
     }
 
-    .btn:hover,
-    .btn:active {
+    .btn:hover {
       background-color: #a06d48;
     }
 
@@ -69,126 +56,64 @@
 
     label {
       display: block;
-      margin: 12px 0 6px;
-      font-weight: 600;
-      font-size: var(--font-large);
-      user-select: none;
+      margin: 10px 0 5px;
+      font-weight: bold;
     }
 
     input[type="number"], textarea {
       width: 100%;
-      padding: 12px 14px;
-      margin-bottom: 14px;
-      border: 1.8px solid #ccc;
-      border-radius: 10px;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
       box-sizing: border-box;
-      font-size: var(--font-large);
-      /* 数字输入控件更大，方便触摸 */
-    }
-
-    /* 复选框标签调整，触控更友好 */
-    input[type="checkbox"] {
-      width: 22px;
-      height: 22px;
-      vertical-align: middle;
-      cursor: pointer;
-      margin-right: 8px;
     }
 
     .person-block {
       background: var(--card);
-      border: 1.8px solid #ddd;
+      border: 1px solid #ddd;
       border-radius: var(--border-radius);
-      padding: 20px 20px 25px;
-      margin-bottom: 28px;
-      box-shadow: 0 3px 6px rgba(0,0,0,0.07);
-      font-size: var(--font-large);
+      padding: 15px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
 
     .output {
       background: #f2f2f2;
-      padding: 18px;
+      padding: 15px;
       border-radius: var(--border-radius);
       white-space: pre-wrap;
       margin-top: 20px;
-      font-size: var(--font-large);
-      line-height: 1.6;
+      font-size: 15px;
     }
 
     .subheader {
-      font-size: 20px;
+      font-size: 18px;
       color: #7a4212;
-      margin: 22px 0 14px;
-      font-weight: 700;
+      margin: 20px 0 10px;
     }
 
     .order-entry {
       background: #fff;
-      border: 1.8px solid #ccc;
-      padding: 18px 20px;
+      border: 1px solid #ccc;
+      padding: 12px;
       border-radius: var(--border-radius);
-      margin-bottom: 20px;
+      margin-bottom: 15px;
       position: relative;
-      font-size: var(--font-large);
-      line-height: 1.5;
     }
 
     .edit-btn {
       position: absolute;
-      top: 14px;
-      right: 14px;
+      top: 10px;
+      right: 10px;
       background: #ccc;
       color: #000;
       border: none;
-      border-radius: 8px;
-      padding: 6px 12px;
+      border-radius: 6px;
+      padding: 4px 8px;
       cursor: pointer;
-      font-size: 14px;
-      user-select: none;
-      touch-action: manipulation;
+      font-size: 12px;
     }
-
-    /* 响应式布局：平板及以上宽度 */
-    @media (min-width: 768px) {
-      body {
-        padding: 30px 50px;
-      }
-
-      #order, #summary {
-        display: flex;
-        gap: 30px;
-      }
-
-      #order > div#bowlDetails {
-        flex: 2;
-        max-height: 80vh;
-        overflow-y: auto;
-        padding-right: 15px;
-        border-right: 2px solid var(--primary);
-      }
-
-      #order > div#orderForm {
-        flex: 1;
-        max-width: 300px;
-      }
-
-      /* 重新排列“创建新订单”里的input和label，包成orderForm */
-      #order > #orderForm {
-        display: flex;
-        flex-direction: column;
-      }
-
-      /* summary区域多栏 */
-      #summaryArea {
-        max-height: 80vh;
-        overflow-y: auto;
-      }
-
-      .btn {
-        min-width: 140px;
-      }
-    }
-
   </style>
 </head>
 <body>
@@ -200,26 +125,23 @@
 
   <div id="order" class="hidden section">
     <h2>📝 创建新订单</h2>
-    <div id="orderForm">
-      <label>👥 用餐人数：</label>
-      <input type="number" id="numPeople" min="1" max="20" value="1" />
+    <label>👥 用餐人数：</label>
+    <input type="number" id="numPeople" min="1" max="20" value="1">
 
-      <label>🥣 共用几碗汤？</label>
-      <input type="number" id="numBowls" min="1" max="10" value="1" />
-
-      <label>🍚 白饭几碗：</label>
-      <input type="number" id="whiteRice" min="0" value="0" />
-
-      <label>🍚 芋头饭几碗：</label>
-      <input type="number" id="taroRice" min="0" value="0" />
-
-      <button class="btn" onclick="generateFinalOrder()">✅ 提交订单</button>
-      <button class="btn" onclick="showSection('summary')">📋 查看订单总表</button>
-      <button class="btn" onclick="exportOrders()">📤 导出订单 (txt)</button>
-    </div>
+    <label>🥣 共用几碗汤？</label>
+    <input type="number" id="numBowls" min="1" max="10" value="1">
 
     <div id="bowlDetails"></div>
 
+    <label>🍚 白饭几碗：</label>
+    <input type="number" id="whiteRice" min="0" value="0">
+
+    <label>🍚 芋头饭几碗：</label>
+    <input type="number" id="taroRice" min="0" value="0">
+
+    <button class="btn" onclick="generateFinalOrder()">✅ 提交订单</button>
+    <button class="btn" onclick="showSection('summary')">📋 查看订单总表</button>
+    <button class="btn" onclick="exportOrders()">📤 导出订单 (txt)</button>
     <div id="finalOutput"></div>
   </div>
 
@@ -368,7 +290,11 @@
       orders.forEach((o, idx) => {
         const div = document.createElement("div");
         div.className = "order-entry";
-        div.innerHTML = `<button class='edit-btn' onclick='editOrder(${idx})'>✏️ 编辑</button><pre>${o.text}</pre>`;
+        div.innerHTML = `
+          <button class='edit-btn' onclick='editOrder(${idx})'>✏️ 编辑</button>
+          <button class='edit-btn' style="right: 80px; background:#e57373;" onclick='deleteOrder(${idx})'>🗑 删除</button>
+          <pre>${o.text}</pre>
+        `;
         area.appendChild(div);
       });
     }
@@ -392,6 +318,15 @@
       showSection("order");
     }
 
+    function deleteOrder(index) {
+      if (confirm("确定要删除这笔订单吗？此操作不可恢复。")) {
+        const orders = JSON.parse(localStorage.getItem("orders") || "[]");
+        orders.splice(index, 1);
+        localStorage.setItem("orders", JSON.stringify(orders));
+        renderSummary();
+      }
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
       document.getElementById("numPeople").addEventListener("input", generateBowlSections);
       document.getElementById("numBowls").addEventListener("input", generateBowlSections);
@@ -400,6 +335,7 @@
   </script>
 </body>
 </html>
+
 
 
 
