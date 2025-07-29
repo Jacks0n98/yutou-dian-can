@@ -15,6 +15,7 @@
     label { display: block; margin-top: 5px; }
     textarea { width: 100%; height: 50px; margin-top: 5px; }
     .output { white-space: pre-wrap; background: #eee; padding: 15px; border-radius: 5px; margin-top: 20px; }
+    .subheader { font-weight: bold; margin: 15px 0 10px; font-size: 16px; color: #7a4212; }
   </style>
 </head>
 <body>
@@ -29,10 +30,10 @@
   <div id="order" class="hidden section">
     <h2>📝 创建新订单</h2>
     <label>👥 用餐人数：</label>
-    <input type="number" id="numPeople" min="1" max="20" value="1" onchange="generateBowlSections()">
+    <input type="number" id="numPeople" min="1" max="20" value="1">
 
-    <label>🥣 这些人共用几碗汤？</label>
-    <input type="number" id="numBowls" min="1" max="10" value="1" onchange="generateBowlSections()">
+    <label>🥣 共用几碗汤？</label>
+    <input type="number" id="numBowls" min="1" max="10" value="1">
 
     <div id="bowlDetails"></div>
 
@@ -74,6 +75,12 @@
       const numBowls = parseInt(document.getElementById("numBowls").value);
       const area = document.getElementById("bowlDetails");
       area.innerHTML = '';
+
+      const header = document.createElement("div");
+      header.className = "subheader";
+      header.textContent = "👇 请设置每碗汤的内容：";
+      area.appendChild(header);
+
       for (let i = 0; i < numBowls; i++) {
         const div = document.createElement("div");
         div.className = "person-block";
@@ -121,11 +128,14 @@
       document.getElementById("summaryArea").innerHTML = `<div class="output">${all || "暂无订单"}</div>`;
     }
 
-    // 初始加载自动显示订单部分汤碗设置
+    // 自动更新碗区块监听
     window.addEventListener('DOMContentLoaded', () => {
+      document.getElementById("numPeople").addEventListener("input", generateBowlSections);
+      document.getElementById("numBowls").addEventListener("input", generateBowlSections);
       generateBowlSections();
     });
   </script>
 </body>
 </html>
+
 
