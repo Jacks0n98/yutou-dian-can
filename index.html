@@ -140,6 +140,7 @@
 </head>
 <body>
   <h1>🍲 大山脚芋头饭专卖店</h1>
+
   <div id="home">
     <button class="btn" onclick="showSection('order')">📝 创建新订单</button>
     <button class="btn" onclick="showSection('summary')">📋 查看订单总表</button>
@@ -236,9 +237,12 @@
 
     function generateFinalOrder() {
       const orders = JSON.parse(localStorage.getItem("orders") || "[]");
+
+      // 使用本地时间（UTC+8）
       const now = new Date();
-      const today = now.toISOString().split("T")[0];
-      const time = now.toTimeString().split(":" ).slice(0, 2).join(":" );
+      const local = new Date(now.getTime() + (8 * 60 * 60 * 1000));
+      const today = `${local.getFullYear()}-${String(local.getMonth() + 1).padStart(2, '0')}-${String(local.getDate()).padStart(2, '0')}`;
+      const time = `${String(local.getHours()).padStart(2, '0')}:${String(local.getMinutes()).padStart(2, '0')}`;
 
       let orderNumber;
       if (editingIndex === null) {
@@ -303,8 +307,11 @@
       const area = document.getElementById("summaryArea");
       area.innerHTML = '';
 
-      const today = new Date().toISOString().split("T")[0];
+      const now = new Date();
+      const local = new Date(now.getTime() + (8 * 60 * 60 * 1000));
+      const today = `${local.getFullYear()}-${String(local.getMonth() + 1).padStart(2, '0')}-${String(local.getDate()).padStart(2, '0')}`;
       const todayOrders = orders.filter(o => o.date === today);
+
       area.innerHTML += `<div class="output">📌 今天共 ${todayOrders.length} 笔订单</div><br/>`;
 
       if (!orders.length) {
