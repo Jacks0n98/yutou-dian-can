@@ -67,6 +67,7 @@
       border: 1px solid #ccc;
       border-radius: 6px;
       box-sizing: border-box;
+      font-size: 16px;
     }
 
     .person-block {
@@ -128,6 +129,25 @@
       font-size: 12px;
     }
 
+    .numpad {
+      display: flex;
+      flex-wrap: wrap;
+      max-width: 200px;
+      margin: 10px auto;
+      justify-content: center;
+    }
+
+    .numpad button {
+      width: 60px;
+      height: 60px;
+      margin: 5px;
+      font-size: 18px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      background: #fff;
+      cursor: pointer;
+    }
+
     @media print {
       body *:not(#printArea):not(#printArea *) {
         display: none !important;
@@ -136,7 +156,7 @@
         display: block;
         font-size: 14px;
       }
-      emoji {
+      #printArea emoji, emoji {
         display: none;
       }
     }
@@ -166,6 +186,9 @@
     <label>🍚 芋头饭几碗：</label>
     <input type="number" id="taroRice" min="0" value="0">
 
+    <label>📝 订单备注：</label>
+    <textarea id="orderNote" rows="3" placeholder="例如：不要辣、分装汤等"></textarea>
+
     <button class="btn" onclick="generateFinalOrder()">✅ 提交订单</button>
     <div id="finalOutput"></div>
   </div>
@@ -188,7 +211,6 @@
     };
 
     let editingIndex = null;
-    let editingData = null;
 
     function showSection(id) {
       document.getElementById('home').classList.add('hidden');
@@ -241,6 +263,7 @@
       const numBowls = parseInt(document.getElementById("numBowls").value);
       const whiteRice = parseInt(document.getElementById("whiteRice").value);
       const taroRice = parseInt(document.getElementById("taroRice").value);
+      const note = document.getElementById("orderNote").value.trim();
 
       let result = `📅 日期：${today}\n🕒 时间：${time}\n🧾 订单编号：${orderNumber}\n👥 用餐人数：${numPeople}\n🥣 汤共 ${numBowls} 碗\n`;
       const bowlData = [];
@@ -253,6 +276,7 @@
       }
 
       result += `\n🍚 白饭：${whiteRice} 碗\n🍚 芋头饭：${taroRice} 碗`;
+      if (note) result += `\n📝 备注：${note}`;
 
       document.getElementById("finalOutput").innerHTML = `<div class="output">${result}</div>`;
 
@@ -265,6 +289,7 @@
         numBowls,
         whiteRice,
         taroRice,
+        note,
         bowls: bowlData
       };
 
@@ -277,13 +302,11 @@
       }
 
       localStorage.setItem("orders", JSON.stringify(orders));
-
       const printDiv = document.getElementById("printArea");
       printDiv.innerHTML = `<pre>${result}</pre>`;
       printDiv.style.display = 'block';
       window.print();
       printDiv.style.display = 'none';
-
       showSection('summary');
     }
 
@@ -330,22 +353,26 @@
     function editOrder(index) {
       editingIndex = index;
       const orders = JSON.parse(localStorage.getItem("orders") || "[]");
-      editingData = orders[index];
-      document.getElementById("numPeople").value = editingData.numPeople;
-      document.getElementById("numBowls").value = editingData.numBowls;
-      document.getElementById("whiteRice").value = editingData.whiteRice;
-      document.getElementById("taroRice").value = editingData.taroRice;
+      const order = orders[index];
+      document.getElementById("numPeople").value = order.numPeople;
+      document.getElementById("numBowls").value = order.numBowls;
+      document.getElementById("whiteRice").value = order.whiteRice;
+      document.getElementById("taroRice").value = order.taroRice;
+      document.getElementById("orderNote").value = order.note || "";
       showSection("order");
 
       setTimeout(() => {
-        editingData.bowls.forEach((b, i) => {
-          document.querySelector(`input[name="b${i}_count"]`).value = b.count;
-          b.noItems.forEach(item => {
-            const cb = document.querySelector(`input[name="b${i}_no"][value="${item}"]`);
-            if (cb) cb.checked = true;
+        generateBowlSections();
+        setTimeout(() => {
+          order.bowls.forEach((b, i) => {
+            const countInput = document.querySelector(`input[name="b${i}_count"]`);
+            if (countInput) countInput.value = b.count;
+            b.noItems.forEach(item => {
+              const cb = document.querySelector(`input[name="b${i}_no"][value="${item}"]`);
+              if (cb) cb.checked = true;
+            });
           });
-        });
-        editingData = null;
+        }, 100);
       }, 100);
     }
 
@@ -365,6 +392,7 @@
   </script>
 </body>
 </html>
+
 
 
 
