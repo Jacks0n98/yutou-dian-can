@@ -257,8 +257,9 @@
         const div = document.createElement("div");
         div.className = "order-entry";
         div.innerHTML = `
-          <button class="delete-btn" onclick="deleteOrder(${i})">🗑️ 删除</button>
-          <pre>${o.text}</pre>`;
+  <button class="edit-btn" onclick="editOrder(${i})">✏️ 编辑</button>
+  <button class="delete-btn" onclick="deleteOrder(${i})">🗑️ 删除</button>
+  <pre>${o.text}</pre>`;
         area.appendChild(div);
       });
     }
