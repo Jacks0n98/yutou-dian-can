@@ -191,8 +191,8 @@
     }
 
     function generateFinalOrder() {
-      const now = new Date();
-      const offset = now.getTimezoneOffset();
+      const date = new Date();
+      const dateStr = date.toLocaleString("zh-CN", { hour12: false });
       const local = new Date(now.getTime() - offset * 60000);
       const today = local.toISOString().slice(0, 10);
       const time = local.toTimeString().slice(0, 5);
