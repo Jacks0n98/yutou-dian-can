@@ -134,6 +134,12 @@
       }
       #printArea {
         display: block;
+        font-size: 14px;
+      }
+
+      /* 打印时隐藏 emoji */
+      #printArea emoji, emoji {
+        display: none;
       }
     }
   </style>
@@ -186,33 +192,14 @@
     let editingIndex = null;
     let editingData = null;
 
-    function showSection(sectionId) {
+    function showSection(id) {
       document.getElementById('home').classList.add('hidden');
       document.getElementById('order').classList.add('hidden');
       document.getElementById('summary').classList.add('hidden');
-      document.getElementById(sectionId).classList.remove('hidden');
+      document.getElementById(id).classList.remove('hidden');
 
-      if (sectionId === 'summary') renderSummary();
-      if (sectionId === 'order') {
-        generateBowlSections();
-        if (editingData) {
-          document.getElementById("numPeople").value = editingData.numPeople;
-          document.getElementById("numBowls").value = editingData.numBowls;
-          document.getElementById("whiteRice").value = editingData.whiteRice;
-          document.getElementById("taroRice").value = editingData.taroRice;
-          generateBowlSections();
-          setTimeout(() => {
-            editingData.bowls.forEach((bowl, i) => {
-              document.querySelector(`input[name="b${i}_count"]`).value = bowl.count;
-              bowl.noItems.forEach(item => {
-                const cb = document.querySelector(`input[name="b${i}_no"][value="${item}"]`);
-                if (cb) cb.checked = true;
-              });
-            });
-            editingData = null;
-          }, 100);
-        }
-      }
+      if (id === 'order') generateBowlSections();
+      if (id === 'summary') renderSummary();
     }
 
     function generateBowlSections() {
@@ -220,6 +207,7 @@
       const numBowls = parseInt(document.getElementById("numBowls").value);
       const area = document.getElementById("bowlDetails");
       area.innerHTML = '<div class="subheader">👇 请设置每碗汤的内容：</div>';
+
       for (let i = 0; i < numBowls; i++) {
         const div = document.createElement("div");
         div.className = "person-block";
@@ -229,7 +217,7 @@
           <label>这碗汤不吃的材料：</label>`;
         ingredients.forEach(item => {
           const emoji = emojiMap[item] || "";
-          div.innerHTML += `<label><input type="checkbox" name="b${i}_no" value="${item}"> ${emoji} ${item}</label>`;
+          div.innerHTML += `<label><input type="checkbox" name="b${i}_no" value="${item}"> <emoji>${emoji}</emoji> ${item}</label>`;
         });
         area.appendChild(div);
       }
@@ -237,9 +225,8 @@
 
     function generateFinalOrder() {
       const orders = JSON.parse(localStorage.getItem("orders") || "[]");
-
-      // 使用本地时间（UTC+8）
       const now = new Date();
+      const local = new Date(now.getTime() + (8 * 60 * 60 * 1000));
       const today = `${local.getFullYear()}-${String(local.getMonth() + 1).padStart(2, '0')}-${String(local.getDate()).padStart(2, '0')}`;
       const time = `${String(local.getHours()).padStart(2, '0')}:${String(local.getMinutes()).padStart(2, '0')}`;
 
@@ -345,7 +332,22 @@
       editingIndex = index;
       const orders = JSON.parse(localStorage.getItem("orders") || "[]");
       editingData = orders[index];
+      document.getElementById("numPeople").value = editingData.numPeople;
+      document.getElementById("numBowls").value = editingData.numBowls;
+      document.getElementById("whiteRice").value = editingData.whiteRice;
+      document.getElementById("taroRice").value = editingData.taroRice;
       showSection("order");
+
+      setTimeout(() => {
+        editingData.bowls.forEach((b, i) => {
+          document.querySelector(`input[name="b${i}_count"]`).value = b.count;
+          b.noItems.forEach(item => {
+            const cb = document.querySelector(`input[name="b${i}_no"][value="${item}"]`);
+            if (cb) cb.checked = true;
+          });
+        });
+        editingData = null;
+      }, 100);
     }
 
     function deleteOrder(index) {
@@ -364,6 +366,7 @@
   </script>
 </body>
 </html>
+
 
 
 
