@@ -240,7 +240,6 @@
 
       // 使用本地时间（UTC+8）
       const now = new Date();
-      const local = new Date(now.getTime() + (8 * 60 * 60 * 1000));
       const today = `${local.getFullYear()}-${String(local.getMonth() + 1).padStart(2, '0')}-${String(local.getDate()).padStart(2, '0')}`;
       const time = `${String(local.getHours()).padStart(2, '0')}:${String(local.getMinutes()).padStart(2, '0')}`;
 
