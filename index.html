@@ -21,10 +21,13 @@
       color: #333;
     }
 
-    h1 {
-      font-size: 26px;
-      margin-bottom: 20px;
+    h1, h2, h3 {
       color: var(--primary);
+    }
+
+    h1 {
+      font-size: 28px;
+      margin-bottom: 20px;
     }
 
     .section {
@@ -32,13 +35,15 @@
     }
 
     .btn {
+      display: inline-block;
       background-color: var(--primary);
       color: white;
-      padding: 10px 18px;
-      margin: 8px 5px;
+      padding: 12px 20px;
+      margin: 10px 5px;
       border: none;
       border-radius: 8px;
       cursor: pointer;
+      transition: background 0.3s ease;
     }
 
     .btn:hover {
@@ -59,33 +64,43 @@
       width: 100%;
       padding: 10px;
       margin-bottom: 10px;
-      border-radius: 6px;
       border: 1px solid #ccc;
+      border-radius: 6px;
+      box-sizing: border-box;
       font-size: 16px;
     }
 
-    .output {
-      background: #f9f9f9;
-      padding: 15px;
-      border-radius: 10px;
-      white-space: pre-wrap;
-      margin-top: 15px;
+    .person-block {
+      background: var(--card);
       border: 1px solid #ddd;
+      border-radius: var(--border-radius);
+      padding: 15px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .output {
+      background: #f2f2f2;
+      padding: 15px;
+      border-radius: var(--border-radius);
+      white-space: pre-wrap;
+      margin-top: 20px;
+      font-size: 15px;
     }
 
     .order-entry {
-      background: white;
+      background: #fff;
       border: 1px solid #ccc;
       padding: 12px;
-      border-radius: 10px;
-      margin-bottom: 12px;
+      border-radius: var(--border-radius);
+      margin-bottom: 15px;
       position: relative;
     }
 
     .edit-btn, .delete-btn {
       position: absolute;
-      top: 8px;
-      padding: 4px 10px;
+      top: 10px;
+      padding: 4px 8px;
       font-size: 12px;
       border: none;
       border-radius: 6px;
@@ -98,9 +113,29 @@
     }
 
     .delete-btn {
-      right: 80px;
+      right: 70px;
       background: #e74c3c;
       color: white;
+    }
+
+    #numPad {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: white;
+      padding: 10px;
+      border-top: 1px solid #ccc;
+      box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+      z-index: 9999;
+    }
+
+    #numPad button {
+      width: 30%;
+      margin: 5px 1%;
+      font-size: 20px;
+      padding: 12px;
     }
 
     @media print {
@@ -109,9 +144,7 @@
       }
       #printArea {
         display: block;
-      }
-      emoji {
-        display: none;
+        font-size: 14px;
       }
     }
   </style>
@@ -128,21 +161,21 @@
     <h2>📝 创建新订单</h2>
 
     <label>👥 用餐人数：</label>
-    <input type="number" id="numPeople" min="1" value="1" inputmode="numeric">
+    <input type="number" id="numPeople" min="1" value="1">
 
     <label>🥣 共用几碗汤？</label>
-    <input type="number" id="numBowls" min="1" value="1" inputmode="numeric">
+    <input type="number" id="numBowls" min="1" value="1">
 
     <div id="bowlDetails"></div>
 
     <label>🍚 白饭几碗：</label>
-    <input type="number" id="whiteRice" min="0" value="0" inputmode="numeric">
+    <input type="number" id="whiteRice" min="0" value="0">
 
     <label>🍚 芋头饭几碗：</label>
-    <input type="number" id="taroRice" min="0" value="0" inputmode="numeric">
+    <input type="number" id="taroRice" min="0" value="0">
 
-    <label>📝 备注：</label>
-    <textarea id="remarks" rows="2" placeholder="如：加辣、少饭、不辣等..."></textarea>
+    <label>📝 订单备注：</label>
+    <textarea id="orderNote" placeholder="如有特别备注可填写"></textarea>
 
     <button class="btn" onclick="generateFinalOrder()">✅ 提交订单</button>
     <div id="finalOutput"></div>
@@ -150,19 +183,15 @@
 
   <div id="summary" class="hidden section">
     <h2>📋 订单总表</h2>
-    <div id="summaryArea"></div>
     <button class="btn" onclick="showSection('order')">⬅ 返回点餐</button>
+    <button class="btn" onclick="exportOrders()">📤 导出订单</button>
+    <div id="summaryArea"></div>
   </div>
 
-  <div id="printArea" style="display:none;"></div>
+  <div id="printArea" style="display:none"></div>
+  <div id="numPad"></div>
 
   <script>
-    const ingredients = ["猪肝", "猪腰", "猪肠", "猪肚", "猪舌头", "猪心", "瘦肉", "肥肉", "菜", "肉丸"];
-    const emojiMap = {
-      "猪肝": "🫀", "猪腰": "🫘", "猪肠": "➰", "猪肚": "🫃", "猪舌头": "👅",
-      "猪心": "❤️", "瘦肉": "🍖", "肥肉": "🥓", "菜": "🥬", "肉丸": "🍡"
-    };
-
     let editingIndex = null;
 
     function showSection(id) {
@@ -170,115 +199,172 @@
       document.getElementById('order').classList.add('hidden');
       document.getElementById('summary').classList.add('hidden');
       document.getElementById(id).classList.remove('hidden');
-      if (id === 'order') generateBowlDetails();
       if (id === 'summary') renderSummary();
     }
 
-    function generateBowlDetails() {
-      const area = document.getElementById("bowlDetails");
-      const numBowls = parseInt(document.getElementById("numBowls").value);
-      area.innerHTML = "";
-      for (let i = 0; i < numBowls; i++) {
+    function generateBowlSections() {
+      const count = +document.getElementById("numBowls").value;
+      const container = document.getElementById("bowlDetails");
+      container.innerHTML = '';
+      for (let i = 0; i < count; i++) {
         const div = document.createElement("div");
-        div.innerHTML = `<strong>🥣 第 ${i + 1} 碗汤（不吃的材料）：</strong><br>`;
-        ingredients.forEach(item => {
-          const emoji = emojiMap[item] || "";
-          div.innerHTML += `<label><input type="checkbox" name="b${i}_no" value="${item}"> <emoji>${emoji}</emoji> ${item}</label> `;
-        });
-        div.innerHTML += `<br>共用人数：<input type="number" name="b${i}_count" min="1" value="1" inputmode="numeric"><br><br>`;
-        area.appendChild(div);
+        div.className = "person-block";
+        div.innerHTML = `
+          <h3>🥣 第 ${i + 1} 碗</h3>
+          <label>几人共用：</label>
+          <input type="number" name="b${i}_count" min="1" value="1">
+          <label>🈚 不要的材料：</label>
+          <label><input type="checkbox" name="b${i}_no" value="猪心"> 🐷 猪心</label>
+          <label><input type="checkbox" name="b${i}_no" value="肉"> 🐷 肉</label>
+          <label><input type="checkbox" name="b${i}_no" value="粉肠"> 粉肠</label>
+          <label><input type="checkbox" name="b${i}_no" value="肝"> 肝</label>
+          <label><input type="checkbox" name="b${i}_no" value="菜"> 菜</label>
+        `;
+        container.appendChild(div);
       }
     }
 
     function generateFinalOrder() {
-      const now = new Date();
-      const offset = now.getTimezoneOffset();
-      const local = new Date(now.getTime() - offset * 60000);
-      const today = local.toISOString().slice(0, 10);
-      const time = local.toTimeString().slice(0, 5);
+      const date = new Date();
+      const dateStr = date.toLocaleString("zh-CN", { hour12: false });
 
       const orders = JSON.parse(localStorage.getItem("orders") || "[]");
-      const orderNumber = (parseInt(localStorage.getItem("lastOrder") || "0") + 1) % 9999;
-      localStorage.setItem("lastOrder", orderNumber);
+      const num = orders.length + 1;
 
       const numPeople = document.getElementById("numPeople").value;
       const numBowls = document.getElementById("numBowls").value;
       const whiteRice = document.getElementById("whiteRice").value;
       const taroRice = document.getElementById("taroRice").value;
-      const remarks = document.getElementById("remarks").value;
+      const note = document.getElementById("orderNote").value;
 
-      let text = `📅 日期：${today}\n🕒 时间：${time}\n🧾 订单编号：${orderNumber}\n👥 用餐人数：${numPeople}\n\n`;
+      let text = `# 订单编号：${num}\n🕒 创建时间：${dateStr}\n👥 人数：${numPeople}\n🥣 汤共 ${numBowls} 碗`;
 
       for (let i = 0; i < numBowls; i++) {
+        const count = document.querySelector(`input[name="b${i}_count"]`).value;
         const noItems = Array.from(document.querySelectorAll(`input[name="b${i}_no"]:checked`)).map(cb => cb.value);
-        const people = document.querySelector(`input[name="b${i}_count"]`).value;
-        text += `🥣 第 ${i + 1} 碗：${people}人共用`;
-        if (noItems.length) {
-          text += `（忌口：${noItems.join("、")}）`;
-        }
-        text += `\n`;
+        text += `\n  🥣 第${i + 1}碗 - ${count}人共用`;
+        if (noItems.length) text += ` （无：${noItems.join("、")}）`;
       }
 
-      text += `\n🍚 白饭：${whiteRice} 碗\n🍚 芋头饭：${taroRice} 碗\n`;
-      if (remarks.trim()) {
-        text += `📝 备注：${remarks.trim()}\n`;
-      }
+      text += `\n🍚 白饭：${whiteRice} 碗 | 芋头饭：${taroRice} 碗`;
+      if (note) text += `\n📌 备注：${note}`;
 
-      orders.unshift({
-        date: today,
-        time,
-        number: orderNumber,
-        text
-      });
+      const order = { text, timestamp: date.toISOString(), numPeople, numBowls, whiteRice, taroRice, note };
+
+      if (editingIndex !== null) {
+        orders[editingIndex] = order;
+        editingIndex = null;
+      } else {
+        orders.push(order);
+      }
 
       localStorage.setItem("orders", JSON.stringify(orders));
+      document.getElementById("finalOutput").innerText = text;
+      printOrder(text);
+    }
 
-      document.getElementById("finalOutput").innerHTML = `<div class="output">${text}</div>`;
-
-      // 打印
-      document.getElementById("printArea").innerHTML = `<pre>${text}</pre>`;
-      document.getElementById("printArea").style.display = "block";
-      window.print();
-      document.getElementById("printArea").style.display = "none";
-
-      showSection('summary');
+    function printOrder(content) {
+      const win = window.open('', '_blank');
+      win.document.write(`<pre>${content.replaceAll("\n", "<br>")}</pre>`);
+      win.print();
+      win.close();
     }
 
     function renderSummary() {
       const orders = JSON.parse(localStorage.getItem("orders") || "[]");
       const area = document.getElementById("summaryArea");
-      area.innerHTML = "";
+      area.innerHTML = '';
 
       const today = new Date().toISOString().slice(0, 10);
-      const todayOrders = orders.filter(o => o.date === today);
-      area.innerHTML += `<div class="output">📌 今天共 ${todayOrders.length} 笔订单</div><br>`;
+      const todayOrders = orders.filter(o => o.timestamp.startsWith(today));
+      const summary = document.createElement("div");
+      summary.innerHTML = `<strong>📅 今日订单数：${todayOrders.length}</strong>`;
+      area.appendChild(summary);
 
-      orders.forEach((o, i) => {
+      todayOrders.forEach((o, idx) => {
         const div = document.createElement("div");
         div.className = "order-entry";
         div.innerHTML = `
-  <button class="edit-btn" onclick="editOrder(${i})">✏️ 编辑</button>
-  <button class="delete-btn" onclick="deleteOrder(${i})">🗑️ 删除</button>
-  <pre>${o.text}</pre>`;
+          <button class="delete-btn" onclick="deleteOrder(${idx})">删除</button>
+          <button class="edit-btn" onclick="editOrder(${idx})">编辑</button>
+          <pre>${o.text}</pre>
+        `;
         area.appendChild(div);
       });
     }
 
-    function deleteOrder(index) {
-      if (!confirm("确定要删除这份订单吗？")) return;
+    function editOrder(index) {
+      editingIndex = index;
       const orders = JSON.parse(localStorage.getItem("orders") || "[]");
-      orders.splice(index, 1);
-      localStorage.setItem("orders", JSON.stringify(orders));
-      renderSummary();
+      const o = orders[index];
+      document.getElementById("numPeople").value = o.numPeople;
+      document.getElementById("numBowls").value = o.numBowls;
+      document.getElementById("whiteRice").value = o.whiteRice;
+      document.getElementById("taroRice").value = o.taroRice;
+      document.getElementById("orderNote").value = o.note || "";
+      generateBowlSections();
     }
 
-    window.addEventListener('DOMContentLoaded', () => {
-      document.getElementById("numBowls").addEventListener("input", generateBowlDetails);
-      generateBowlDetails();
+    function deleteOrder(index) {
+      const orders = JSON.parse(localStorage.getItem("orders") || "[]");
+      if (confirm("确认删除这笔订单？")) {
+        orders.splice(index, 1);
+        localStorage.setItem("orders", JSON.stringify(orders));
+        renderSummary();
+      }
+    }
+
+    function exportOrders() {
+      const orders = JSON.parse(localStorage.getItem("orders") || "[]");
+      const blob = new Blob([orders.map(o => o.text).join("\n\n------\n\n")], { type: 'text/plain' });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "订单总表.txt";
+      a.click();
+    }
+
+    // 数字键盘支持
+    let currentInput = null;
+    document.querySelectorAll("input[type=number]").forEach(input => {
+      input.addEventListener("focus", () => {
+        currentInput = input;
+        showNumPad();
+      });
     });
+
+    function showNumPad() {
+      const pad = document.getElementById("numPad");
+      pad.innerHTML = '';
+      for (let i = 1; i <= 9; i++) {
+        const btn = document.createElement("button");
+        btn.innerText = i;
+        btn.onclick = () => insertNum(i);
+        pad.appendChild(btn);
+      }
+      const zero = document.createElement("button");
+      zero.innerText = "0";
+      zero.onclick = () => insertNum(0);
+      pad.appendChild(zero);
+
+      const del = document.createElement("button");
+      del.innerText = "←";
+      del.onclick = () => {
+        currentInput.value = currentInput.value.slice(0, -1);
+      };
+      pad.appendChild(del);
+
+      pad.style.display = "block";
+    }
+
+    function insertNum(n) {
+      currentInput.value += n;
+    }
+
+    window.addEventListener("DOMContentLoaded", generateBowlSections);
   </script>
 </body>
 </html>
+
 
 
 
